@@ -6,7 +6,7 @@
 
 The MVP Monolith approach is designed for **speed of development and deployment** when you need to validate your AI Brand Creator concept quickly. This architecture prioritizes getting something working fast over scalability or operational sophistication.
 
-**Choose this approach when:**
+** We can choose this approach when:**
 - You need a working prototype within days or weeks
 - You're building for hackathons, demos, or early validation
 - Your team size is small (1-3 developers)
@@ -14,12 +14,12 @@ The MVP Monolith approach is designed for **speed of development and deployment*
 - You want minimal operational overhead
 - Budget constraints require the lowest possible infrastructure cost
 
-**Don't choose this approach if:**
-- You expect high or unpredictable traffic patterns
-- You need to scale individual components independently
+** When to not choose this approach :**
+- High or unpredictable traffic patterns
+- Scaling individual components independently
 - Multiple teams will be working on different parts of the system
-- You require high availability (99.9%+ uptime)
-- You need sophisticated monitoring and observability
+- High availability (99.9%+ uptime)
+- Sophisticated monitoring and observability
 
 ## System Architecture
 
@@ -243,7 +243,7 @@ curl http://localhost:8000/health/database
 
 ### Scaling Limitations
 
-**When you'll outgrow this architecture:**
+**When it's expected to outgrow this architecture:**
 - Queue builds up faster than GPU can process
 - API becomes unresponsive during heavy inference
 - Single point of failure causes downtime
@@ -260,11 +260,6 @@ curl http://localhost:8000/health/database
 
 **Monthly estimate for moderate usage:** $600-800
 
-### Cost Optimization Tips:
-- Use spot instances for development
-- Implement auto-shutdown during off-hours
-- Use lifecycle policies for S3 storage
-- Monitor and optimize GPU utilization
 
 ## Migration Strategy
 
@@ -283,7 +278,7 @@ curl http://localhost:8000/health/database
 - Team growth requiring service boundaries
 - Reliability requirements increase
 
-## Common Pitfalls
+## Common Pitfalls ( Research backed)
 
 1. **GPU Memory Management**: Not properly clearing CUDA memory between jobs
 2. **Synchronous Operations**: Blocking API while waiting for GPU inference
@@ -293,7 +288,7 @@ curl http://localhost:8000/health/database
 
 ## Success Metrics
 
-Track these KPIs to know when architecture is working:
+We can track these KPIs to know when architecture is working:
 - **Response time**: < 60 seconds for brand kit generation
 - **Success rate**: > 95% successful completions
 - **GPU utilization**: 60-80% average usage
@@ -301,5 +296,3 @@ Track these KPIs to know when architecture is working:
 - **Cost per brand**: Track $/generation to optimize resources
 
 ---
-
-This MVP Monolith approach gets you from zero to working AI Brand Creator fastest, with clear migration paths as your needs grow.
