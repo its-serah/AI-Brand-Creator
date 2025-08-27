@@ -15,7 +15,7 @@ The AI Brand Creator generates complete brand kits including logos, color palett
 - **WCAG compliance** checks
 - **Bilingual rationale** generation
 
-## Architecture Options
+## Architecture Options Comparison
 
 | Architecture | Best For | Complexity | Cost | Scale |
 |-------------|----------|------------|------|-------|
@@ -60,12 +60,6 @@ The AI Brand Creator generates complete brand kits including logos, color palett
 
 ## Quick Start Guide
 
-### Choose Your Architecture
-
-1. **Need something this week?** → Start with [MVP Monolith](./01-mvp-monolith/)
-2. **Launching to first 100–1,000 users?** → Use [Queue-Centric Modular](./02-queue-centric-modular/)
-3. **Spiky traffic, tight budget?** → Go with [Serverless-First](./03-serverless-first/)
-4. **Continuous experiments at scale?** → Choose [Microservices + Streaming](./04-microservices-streaming/)
 
 ### Common Setup Requirements
 
@@ -118,12 +112,12 @@ Each architecture includes:
 - Monitoring configurations
 - Deployment guides
 
-## Migration Path
+## Migration Path Options
 
-Start simple and evolve:
-1. **MVP Monolith** → **Queue-Centric Modular** (when hitting resource limits)
-2. **Queue-Centric** → **Serverless** (for cost optimization)
-3. **Any** → **Microservices** (for maximum flexibility and scale)
+Starting simple and evolving:
+1. **MVP Monolith** to **Queue-Centric Modular** (when hitting resource limits)
+2. **Queue-Centric** to **Serverless** (for cost optimization)
+3. **Any** to **Microservices** (for maximum flexibility and scale)
 
 ## Contributing
 
@@ -137,11 +131,7 @@ Start simple and evolve:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Next Steps
 
-1. Review each architecture's README for detailed rationale
-2. Choose the approach that fits your current needs
-3. Follow the setup guide in your chosen folder
 4. Start building your AI Brand Creator!
 
 ---
