@@ -6,7 +6,7 @@
 
 The Serverless-First approach is designed for **cost-optimized scale** with variable demand patterns. This architecture leverages cloud-native serverless services for CPU workloads while using ephemeral spot GPU instances for expensive inference tasks, making it ideal for cost-conscious teams with unpredictable traffic.
 
-**Choose this approach when:**
+** We can choose this approach when:**
 - You have highly variable or spiky traffic patterns
 - Cost optimization is a primary concern (pay-per-use model)
 - You want to minimize idle resource costs
@@ -15,13 +15,13 @@ The Serverless-First approach is designed for **cost-optimized scale** with vari
 - Your team is comfortable with cloud vendor lock-in
 - Development velocity is more important than vendor independence
 
-**Don't choose this approach if:**
-- You need consistent low-latency responses (cold start issues)
-- You require strict data locality or on-premises deployment
-- You have predictable, consistent traffic (reserved capacity is cheaper)
-- You need complex stateful operations or long-running processes
+**We can't choose this approach if:**
+- Need for consistent low-latency responses (cold start issues)
+- Require strict data locality or on-premises deployment
+- Predictable, consistent traffic (reserved capacity is cheaper)
+- Need for Complex stateful operations or long-running processes
 - Vendor lock-in is a significant concern
-- You require extensive customization of the runtime environment
+- Require extensive customization of the runtime environment
 
 ## System Architecture
 
@@ -577,4 +577,3 @@ This architecture succeeds when:
 
 ---
 
-The Serverless-First + Spot GPU approach provides maximum cost efficiency and automatic scaling, making it ideal for variable workloads where cost optimization is paramount over consistent low latency.
