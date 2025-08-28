@@ -6,7 +6,7 @@
 
 The Queue-Centric Modular approach is designed for **production-ready scalability** with manageable operational complexity. This architecture balances the simplicity of a monolith with the benefits of service separation, making it ideal for teams transitioning from prototype to production.
 
-**Choose this approach when:**
+** We can choose this approach when:**
 - You're launching to first real users (100-1,000+ concurrent)
 - You need independent scaling of different components
 - You have 2-5 developers working on the system
@@ -15,12 +15,12 @@ The Queue-Centric Modular approach is designed for **production-ready scalabilit
 - You need predictable throughput and performance
 - You're planning A/B testing of models or algorithms
 
-**Don't choose this approach if:**
-- You're still in rapid prototyping phase (use MVP Monolith instead)
-- You need to minimize operational complexity at all costs
-- You require global scale with complex routing (use Microservices instead)
-- Your traffic patterns are extremely spiky (consider Serverless instead)
-- You're working solo and need maximum development speed
+**We can not choose this approach when:**
+- Prototyping phase 
+- Minimization of operational complexity at all costs
+- Global scale with complex routing 
+- Traffic patterns are extremely spiky 
+- Working solo and need maximum development speed
 
 ## System Architecture
 
@@ -467,4 +467,3 @@ This architecture is successful when:
 
 ---
 
-The Queue-Centric Modular approach provides the perfect balance between operational simplicity and production scalability, making it ideal for teams ready to scale beyond MVP while maintaining development velocity.
