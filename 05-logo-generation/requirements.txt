@@ -1,0 +1,38 @@
+# AI Logo Generation Requirements
+
+# Core ML Libraries
+torch>=2.6.0
+torchvision>=0.21.0
+diffusers>=0.35.0
+transformers>=4.55.0
+datasets>=4.0.0
+
+# Fine-tuning and Training
+accelerate>=1.10.0
+peft>=0.17.0
+xformers>=0.0.32
+
+# Image Processing
+Pillow>=11.0.0
+matplotlib>=3.10.0
+
+# Data Processing and Analysis
+numpy>=2.2.0
+pandas>=2.2.0
+networkx>=3.4.0
+
+# API and Requests
+requests>=2.32.0
+tqdm>=4.67.0
+
+# Utilities
+safetensors>=0.6.0
+huggingface_hub>=0.34.0
+psutil>=7.0.0
+
+# Optional Dependencies (install if needed)
+# neo4j>=5.0.0              # For advanced knowledge graphs
+# opencv-python>=4.8.0       # For advanced image processing
+# scikit-learn>=1.3.0       # For clustering and analysis
+# streamlit>=1.28.0         # For web interface
+# gradio>=4.0.0             # For quick demos

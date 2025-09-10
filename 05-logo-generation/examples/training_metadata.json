@@ -1,0 +1,27 @@
+{
+  "dataset_size": 803,
+  "top_logo_terms": [
+    "background,",
+    "minimalism,",
+    "modern\"",
+    "foreground,",
+    "there",
+    "inscription"
+  ],
+  "enhanced_prompts": [
+    "minimalist logo design, geometric shapes, flat design, vector art, clean lines, professional branding",
+    "modern business logo, simple icon, corporate identity, scalable design, white background",
+    "professional logo with inscription, clean typography, flat colors",
+    "minimalist inscription logo, vector style, business branding",
+    "simple logo design, geometric symbol, flat design, professional identity"
+  ],
+  "dataset_sample_prompts": [
+    "\"a logo of coffee shop, take-away coffee cardboard glass with white and brown stripes and dark brown lid, coffee circle with three cream drops, white background, brown foreground, minimalism, modern\"",
+    "\"a logo of coffee shop, White round background with black rim, cup, pretzel, horizontal stripe and cookery lettering, tan background, snow, darkslategray foreground, minimalism, modern\"",
+    "\"a logo of coffee shop, image of a filled cup with steam in a square, white background, black, darkgray foreground, minimalism, modern\"",
+    "\"a logo of cafe restaurant bar pizzeria with a slice of pizza at the top part of the circle, label with the year '2020' at the bottom and crossed rectangle in the middle, whitesmoke background, darkslategray, dimgray foreground, minimalism, modern\"",
+    "\"a logo of cafe restaurant bar with a circle with an ornament on the sides, tableware above and two leaves on top and bottom, lightcyan background, midnightblue, midnightblue foreground, minimalism, modern\""
+  ],
+  "approach": "dataset-informed prompt engineering",
+  "note": "This uses knowledge extracted from 803 professional logos to improve prompting"
+}
