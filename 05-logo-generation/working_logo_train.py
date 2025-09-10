@@ -12,7 +12,7 @@ import random
 from tqdm import tqdm
 
 def main():
-    print("🔥 WORKING LOGO FINE-TUNING")
+    print(" WORKING LOGO FINE-TUNING")
     print("=" * 50)
     print("• Loads 803 logo examples from HuggingFace")
     print("• Actually fine-tunes with working API")
@@ -25,27 +25,27 @@ def main():
     output_dir = "./logo_finetuned"
     device = "cpu"
     
-    print(f"🔧 Device: {device}")
-    print(f"📊 Output: {output_dir}")
+    print(f" Device: {device}")
+    print(f" Output: {output_dir}")
     
     # Load dataset
-    print("\n📥 Loading logo dataset...")
+    print("\n Loading logo dataset...")
     try:
         dataset = load_dataset(dataset_name, split="train")
-        print(f"✅ Loaded {len(dataset)} logo examples")
+        print(f" Loaded {len(dataset)} logo examples")
         
         # Show some examples
-        print("\n🔍 Sample prompts from dataset:")
+        print("\n Sample prompts from dataset:")
         for i in range(min(5, len(dataset))):
             text = dataset[i].get('text', 'No text')[:80]
             print(f"  {i+1}. {text}...")
             
     except Exception as e:
-        print(f"❌ Failed to load dataset: {e}")
+        print(f" Failed to load dataset: {e}")
         return
     
     # Load base model
-    print("\n🔄 Loading Stable Diffusion...")
+    print("\n Loading Stable Diffusion...")
     try:
         pipe = StableDiffusionPipeline.from_pretrained(
             model_id,
@@ -55,14 +55,14 @@ def main():
             use_safetensors=True
         )
         pipe = pipe.to(device)
-        print("✅ Base model loaded")
+        print(" Base model loaded")
         
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        print(f" Failed to load model: {e}")
         return
     
     # Use dataset knowledge for better prompting
-    print("\n🧠 Analyzing dataset for logo patterns...")
+    print("\n Analyzing dataset for logo patterns...")
     
     # Extract common logo patterns from dataset
     logo_patterns = []
@@ -84,7 +84,7 @@ def main():
     top_terms = [word for word, count in word_counts.most_common(20) 
                  if len(word) > 3 and word not in ['logo', 'with', 'background', 'white']]
     
-    print(f"🔍 Top logo terms found: {', '.join(top_terms[:10])}")
+    print(f" Top logo terms found: {', '.join(top_terms[:10])}")
     
     # Create enhanced prompts using dataset knowledge
     enhanced_prompts = [
@@ -96,12 +96,12 @@ def main():
     ]
     
     # Test original vs enhanced
-    print("\n🎨 Testing enhanced prompts vs original...")
+    print("\n Testing enhanced prompts vs original...")
     
     os.makedirs(output_dir, exist_ok=True)
     
     # Generate with original model (baseline)
-    print("📊 Baseline generation (original model)...")
+    print(" Baseline generation (original model)...")
     baseline_images = pipe(
         prompt=enhanced_prompts[:2],
         negative_prompt=["photorealistic, complex, cluttered, multiple logos, text, blurry"] * 2,
@@ -113,10 +113,10 @@ def main():
     
     for i, img in enumerate(baseline_images):
         img.save(f"{output_dir}/baseline_logo_{i+1}.png")
-        print(f"✅ Baseline {i+1} saved")
+        print(f" Baseline {i+1} saved")
     
     # Simulate fine-tuning effect with dataset-enhanced prompting
-    print("\n🔧 Applying dataset knowledge enhancement...")
+    print("\n Applying dataset knowledge enhancement...")
     
     # Enhanced generation using dataset patterns
     dataset_enhanced_prompts = []
@@ -127,7 +127,7 @@ def main():
         enhanced = f"{random_example}, vector art style, flat design, clean minimalist, professional branding"
         dataset_enhanced_prompts.append(enhanced)
     
-    print("🎨 Generating with dataset-enhanced prompts...")
+    print(" Generating with dataset-enhanced prompts...")
     enhanced_images = pipe(
         prompt=dataset_enhanced_prompts,
         negative_prompt=["photorealistic, 3d render, complex details, multiple logos, text artifacts, cluttered background, blurry"] * len(dataset_enhanced_prompts),
@@ -139,7 +139,7 @@ def main():
     
     for i, img in enumerate(enhanced_images):
         img.save(f"{output_dir}/enhanced_logo_{i+1}.png")
-        print(f"✅ Enhanced {i+1} saved")
+        print(f" Enhanced {i+1} saved")
     
     # For comparison, generate some "ideal" logo prompts
     ideal_prompts = [
@@ -148,7 +148,7 @@ def main():
         "clean tech logo, minimal geometric shape, contemporary design, flat vector art, business branding"
     ]
     
-    print("🎯 Generating 'ideal' logo-specific prompts...")
+    print(" Generating 'ideal' logo-specific prompts...")
     ideal_images = pipe(
         prompt=ideal_prompts,
         negative_prompt=["photorealistic, realistic, 3d, complex, detailed, ornate, multiple elements, text, letters, cluttered, artistic painting, sketch"] * len(ideal_prompts),
@@ -160,7 +160,7 @@ def main():
     
     for i, img in enumerate(ideal_images):
         img.save(f"{output_dir}/ideal_logo_{i+1}.png")
-        print(f"✅ Ideal {i+1} saved")
+        print(f" Ideal {i+1} saved")
     
     # Save metadata about what we learned
     metadata = {
@@ -176,22 +176,22 @@ def main():
     with open(f"{output_dir}/training_metadata.json", 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    print(f"\n🎉 Training/Enhancement Complete!")
-    print(f"📁 Results saved in: {output_dir}/")
-    print(f"📊 Generated:")
+    print(f"\n Training/Enhancement Complete!")
+    print(f" Results saved in: {output_dir}/")
+    print(f" Generated:")
     print(f"   • 2 baseline logos (original model)")
     print(f"   • 3 dataset-enhanced logos")
     print(f"   • 3 ideal-prompt logos")
     print(f"   • Training metadata")
     
-    print(f"\n💡 What this does:")
+    print(f"\n What this does:")
     print(f"   • Analyzes {len(dataset)} real logo examples")
     print(f"   • Extracts common logo patterns and terms")
     print(f"   • Creates enhanced prompts based on dataset knowledge")
     print(f"   • Applies stronger negative prompts")
     print(f"   • Uses optimized generation parameters")
     
-    print(f"\n🎨 This should produce much better logos than vanilla Stable Diffusion!")
+    print(f"\n This should produce much better logos than vanilla Stable Diffusion!")
 
 if __name__ == "__main__":
     main()

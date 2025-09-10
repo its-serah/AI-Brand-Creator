@@ -347,7 +347,7 @@ Focus on clean, professional design that works at small and large sizes."""
         return f"Could not connect to Ollama: {e}"
 
 def main():
-    print("🎨 Local Logo Generator")
+    print(" Local Logo Generator")
     print("=" * 40)
     
     generator = LocalLogoGenerator()
@@ -376,15 +376,15 @@ def main():
     
     # Get colors
     colors = generator.get_brand_colors(industry, selected_traits)
-    print(f"\n🎨 Using colors: {', '.join(colors)}")
+    print(f"\n Using colors: {', '.join(colors)}")
     
     # Generate logo description with Ollama
-    print("\n🤖 Generating logo concept with AI...")
+    print("\n Generating logo concept with AI...")
     logo_description = generate_logo_with_ollama(brand_name, industry, selected_traits, colors)
-    print(f"\n📝 AI Logo Concept:\n{logo_description}")
+    print(f"\n AI Logo Concept:\n{logo_description}")
     
     # Logo generation options
-    print("\n🖼️  Choose logo type to generate:")
+    print("\n  Choose logo type to generate:")
     print("1. Geometric/Abstract logo")
     print("2. Text-based logo")
     print("3. Industry icon logo")
@@ -397,35 +397,35 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     
     if choice == "1" or choice == "5":
-        print("\n🔷 Generating geometric logo...")
+        print("\n Generating geometric logo...")
         for style in ['modern', 'minimalist', 'creative']:
             logo = generator.generate_geometric_logo(brand_name, colors, style)
             filename = f"{output_dir}/{brand_name.lower()}_{style}_geometric.png"
             logo.save(filename, 'PNG')
-            print(f"✅ Saved: {filename}")
+            print(f" Saved: {filename}")
     
     if choice == "2" or choice == "5":
-        print("\n✍️  Generating text logo...")
+        print("\n  Generating text logo...")
         for style in ['modern', 'shadow', 'outline']:
             logo = generator.generate_text_logo(brand_name, colors, style)
             filename = f"{output_dir}/{brand_name.lower()}_{style}_text.png"
             logo.save(filename, 'PNG')
-            print(f"✅ Saved: {filename}")
+            print(f" Saved: {filename}")
     
     if choice == "3" or choice == "5":
-        print("\n🔸 Generating industry icon logo...")
+        print("\n Generating industry icon logo...")
         logo = generator.generate_icon_logo(brand_name, industry, colors)
         filename = f"{output_dir}/{brand_name.lower()}_icon.png"
         logo.save(filename, 'PNG')
-        print(f"✅ Saved: {filename}")
+        print(f" Saved: {filename}")
     
     if choice == "4" or choice == "5":
-        print("\n🎭 Generating combined logo...")
+        print("\n Generating combined logo...")
         for style in ['modern', 'shadow']:
             logo = generator.generate_combined_logo(brand_name, industry, colors, style)
             filename = f"{output_dir}/{brand_name.lower()}_{style}_combined.png"
             logo.save(filename, 'PNG')
-            print(f"✅ Saved: {filename}")
+            print(f" Saved: {filename}")
     
     # Save logo description
     description_file = f"{output_dir}/{brand_name.lower()}_concept.txt"
@@ -438,14 +438,14 @@ def main():
         f.write("AI-Generated Concept:\n")
         f.write(logo_description)
     
-    print(f"\n🎉 Logo generation complete!")
-    print(f"📁 All files saved in: {output_dir}/")
-    print(f"📝 Concept description: {description_file}")
+    print(f"\n Logo generation complete!")
+    print(f" All files saved in: {output_dir}/")
+    print(f" Concept description: {description_file}")
     
     # Show AI prompt for external tools
-    if input("\n🤖 Show AI image generation prompt? (y/n): ").lower() == 'y':
+    if input("\n Show AI image generation prompt? (y/n): ").lower() == 'y':
         ai_prompt = generator.generate_ai_prompt_logo(brand_name, industry, selected_traits)
-        print(f"\n🎨 Use this prompt in DALL-E, Midjourney, or local Stable Diffusion:")
+        print(f"\n Use this prompt in DALL-E, Midjourney, or local Stable Diffusion:")
         print("-" * 60)
         print(ai_prompt)
         print("-" * 60)

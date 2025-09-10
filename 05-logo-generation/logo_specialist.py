@@ -21,8 +21,8 @@ class LogoSpecialist:
         
     def load_model(self):
         """Load model optimized specifically for logo generation"""
-        print("🔧 Loading Logo-Optimized Stable Diffusion...")
-        print("⚡ Using logo-specific optimizations")
+        print(" Loading Logo-Optimized Stable Diffusion...")
+        print(" Using logo-specific optimizations")
         
         try:
             self.pipeline = StableDiffusionPipeline.from_pretrained(
@@ -43,12 +43,12 @@ class LogoSpecialist:
             self.pipeline = self.pipeline.to("cpu")
             self.pipeline.enable_attention_slicing()
             
-            print("✅ Logo specialist model ready!")
+            print(" Logo specialist model ready!")
             self.model_loaded = True
             return True
             
         except Exception as e:
-            print(f"❌ Model loading failed: {e}")
+            print(f" Model loading failed: {e}")
             return False
     
     def create_logo_prompt(self, brand_name, industry, style="minimalist"):
@@ -134,15 +134,15 @@ watermark, signature, multiple elements, complex composition"""
         
         prompt, negative_prompt = self.create_logo_prompt(brand_name, industry, style)
         
-        print(f"\n🎨 Generating CLEAN LOGO for {brand_name}")
-        print(f"🎯 Strategy: Multiple attempts with logo-specific prompts")
-        print(f"🔧 Style: {style} {industry} logo")
+        print(f"\n Generating CLEAN LOGO for {brand_name}")
+        print(f" Strategy: Multiple attempts with logo-specific prompts")
+        print(f" Style: {style} {industry} logo")
         
         best_images = []
         
         for attempt in range(attempts):
-            print(f"\n🔄 Attempt {attempt + 1}/{attempts}")
-            print(f"📝 Using: {prompt[:60]}...")
+            print(f"\n Attempt {attempt + 1}/{attempts}")
+            print(f" Using: {prompt[:60]}...")
             
             try:
                 # Logo-optimized generation settings
@@ -161,12 +161,12 @@ watermark, signature, multiple elements, complex composition"""
                     # Post-process for logo cleanliness
                     clean_logo = self.post_process_logo(images[0])
                     best_images.append(clean_logo)
-                    print(f"✅ Generated attempt {attempt + 1}")
+                    print(f" Generated attempt {attempt + 1}")
                 
             except Exception as e:
-                print(f"❌ Attempt {attempt + 1} failed: {e}")
+                print(f" Attempt {attempt + 1} failed: {e}")
         
-        print(f"\n🎉 Generated {len(best_images)} logo candidates!")
+        print(f"\n Generated {len(best_images)} logo candidates!")
         return best_images
     
     def save_logo_variants(self, images, brand_name, industry, style):
@@ -184,7 +184,7 @@ watermark, signature, multiple elements, complex composition"""
             filename = f"{output_dir}/{brand_name.lower().replace(' ', '_')}_clean_logo_v{i}.png"
             img.save(filename, "PNG", quality=95)
             saved_files.append(filename)
-            print(f"✅ Saved variant {i}: {filename}")
+            print(f" Saved variant {i}: {filename}")
         
         # Save metadata
         metadata = {
@@ -202,7 +202,7 @@ watermark, signature, multiple elements, complex composition"""
         return saved_files
 
 def main():
-    print("🎯 LOGO SPECIALIST")
+    print(" LOGO SPECIALIST")
     print("=" * 40)
     print("Creates CLEAN, BUSINESS-READY logos")
     print("Uses logo-specific AI optimization")
@@ -211,19 +211,19 @@ def main():
     
     # Get input
     brand_name = input("\nBrand name: ").strip() or "CodeLogo"
-    print(f"✅ Brand: {brand_name}")
+    print(f" Brand: {brand_name}")
     
     print("\nIndustries: tech, creative, fitness, food, finance, healthcare")
     industry = input("Industry: ").strip().lower() or "tech"
-    print(f"✅ Industry: {industry}")
+    print(f" Industry: {industry}")
     
     print("\nStyles: minimalist, modern, bold, elegant")
     style = input("Style: ").strip().lower() or "minimalist"
-    print(f"✅ Style: {style}")
+    print(f" Style: {style}")
     
-    print(f"\n🎯 GENERATING CLEAN LOGO")
-    print(f"🏢 {brand_name} - {industry} - {style}")
-    print(f"🔧 Multiple attempts for best quality")
+    print(f"\n GENERATING CLEAN LOGO")
+    print(f" {brand_name} - {industry} - {style}")
+    print(f" Multiple attempts for best quality")
     
     confirm = input("\nStart generation? (y/n): ").lower()
     if confirm != 'y':
@@ -235,16 +235,16 @@ def main():
     if logos:
         files = specialist.save_logo_variants(logos, brand_name, industry, style)
         
-        print(f"\n🎉 SUCCESS! Generated {len(logos)} clean logo variants")
-        print(f"📁 Saved to: {brand_name.lower().replace(' ', '_')}_clean_logos/")
+        print(f"\n SUCCESS! Generated {len(logos)} clean logo variants")
+        print(f" Saved to: {brand_name.lower().replace(' ', '_')}_clean_logos/")
         
         for file in files:
             print(f"   • {file}")
         
-        print(f"\n🎨 These should look much more like actual logos!")
-        print(f"💡 Open them to compare and pick the best one")
+        print(f"\n These should look much more like actual logos!")
+        print(f" Open them to compare and pick the best one")
     else:
-        print(f"\n❌ Logo generation failed")
+        print(f"\n Logo generation failed")
 
 if __name__ == "__main__":
     main()

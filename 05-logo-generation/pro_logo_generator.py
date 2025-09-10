@@ -13,7 +13,7 @@ try:
     DIFFUSERS_AVAILABLE = True
 except ImportError:
     DIFFUSERS_AVAILABLE = False
-    print("❌ Install diffusers: pip install diffusers")
+    print(" Install diffusers: pip install diffusers")
 
 from PIL import Image
 import requests
@@ -28,11 +28,11 @@ class ProfessionalLogoGenerator:
     def load_model(self):
         """Load Stable Diffusion optimized for CPU"""
         if not DIFFUSERS_AVAILABLE:
-            print("❌ Please install: pip install diffusers torch")
+            print(" Please install: pip install diffusers torch")
             return False
             
-        print("🔄 Loading Stable Diffusion for professional logo generation...")
-        print("📥 First run downloads ~4GB model (one-time setup)")
+        print(" Loading Stable Diffusion for professional logo generation...")
+        print(" First run downloads ~4GB model (one-time setup)")
         print("⏰ This will take 5-15 minutes...")
         
         try:
@@ -54,13 +54,13 @@ class ProfessionalLogoGenerator:
             self.pipeline = self.pipeline.to("cpu")
             self.pipeline.enable_attention_slicing()
             
-            print("✅ Model loaded successfully!")
+            print(" Model loaded successfully!")
             self.model_loaded = True
             return True
             
         except Exception as e:
-            print(f"❌ Model loading failed: {e}")
-            print("💡 Check internet connection and try again")
+            print(f" Model loading failed: {e}")
+            print(" Check internet connection and try again")
             return False
     
     def create_logo_prompt(self, brand_name, industry, style="modern"):
@@ -107,11 +107,11 @@ class ProfessionalLogoGenerator:
         
         prompt, negative_prompt = self.create_logo_prompt(brand_name, industry, style)
         
-        print(f"\n🎨 Generating {num_logos} professional logo(s) for {brand_name}...")
-        print(f"🏢 Industry: {industry}")
-        print(f"✨ Style: {style}")
+        print(f"\n Generating {num_logos} professional logo(s) for {brand_name}...")
+        print(f" Industry: {industry}")
+        print(f" Style: {style}")
         print(f"⏰ Estimated time: {num_logos * 3}-{num_logos * 8} minutes")
-        print(f"📝 Prompt: {prompt[:80]}...")
+        print(f" Prompt: {prompt[:80]}...")
         
         try:
             # Generate with CPU-optimized settings
@@ -126,11 +126,11 @@ class ProfessionalLogoGenerator:
                 generator=torch.manual_seed(42)  # Reproducible
             ).images
             
-            print(f"✅ Successfully generated {len(images)} professional logo(s)!")
+            print(f" Successfully generated {len(images)} professional logo(s)!")
             return images
             
         except Exception as e:
-            print(f"❌ Logo generation failed: {e}")
+            print(f" Logo generation failed: {e}")
             return []
     
     def save_logos(self, images, brand_name, industry, style):
@@ -150,7 +150,7 @@ class ProfessionalLogoGenerator:
             filename = f"{output_dir}/{brand_name.lower()}_{style}_{industry}_logo_{i}.png"
             img.save(filename, "PNG", quality=95)
             saved_files.append(filename)
-            print(f"✅ Saved: {filename}")
+            print(f" Saved: {filename}")
         
         # Save metadata
         metadata = {
@@ -167,7 +167,7 @@ class ProfessionalLogoGenerator:
         with open(metadata_file, 'w') as f:
             json.dump(metadata, f, indent=2)
         
-        print(f"📋 Metadata saved: {metadata_file}")
+        print(f" Metadata saved: {metadata_file}")
         return saved_files
 
 def generate_concept_with_ollama(brand_name, industry):
@@ -194,13 +194,13 @@ def generate_concept_with_ollama(brand_name, industry):
     return f"Modern {industry} logo with clean typography and professional color scheme"
 
 def main():
-    print("🎨 PROFESSIONAL LOGO GENERATOR")
+    print(" PROFESSIONAL LOGO GENERATOR")
     print("=" * 50)
     print("Generate high-quality AI logos using Stable Diffusion")
     print("Optimized for your AMD Ryzen 5 6600U laptop")
     
     if not DIFFUSERS_AVAILABLE:
-        print("\n❌ Missing requirements!")
+        print("\n Missing requirements!")
         print("Install with: pip install diffusers torch")
         return
     
@@ -231,19 +231,19 @@ def main():
     except:
         num_logos = 2
     
-    print(f"\n🎯 GENERATING LOGOS FOR: {brand_name.upper()}")
-    print(f"🏢 Industry: {industry}")
-    print(f"✨ Style: {style}")
-    print(f"🔢 Quantity: {num_logos}")
+    print(f"\n GENERATING LOGOS FOR: {brand_name.upper()}")
+    print(f" Industry: {industry}")
+    print(f" Style: {style}")
+    print(f" Quantity: {num_logos}")
     
     # Get AI concept
-    print(f"\n🤖 Getting design concept from Ollama...")
+    print(f"\n Getting design concept from Ollama...")
     concept = generate_concept_with_ollama(brand_name, industry)
-    print(f"💡 Concept: {concept}")
+    print(f" Concept: {concept}")
     
     # Generate logos
-    print(f"\n🚀 Starting professional logo generation...")
-    print(f"⚠️  First run downloads ~4GB model")
+    print(f"\n Starting professional logo generation...")
+    print(f"  First run downloads ~4GB model")
     
     confirm = input("\nProceed with generation? (y/n): ").lower()
     if confirm != 'y':
@@ -256,18 +256,18 @@ def main():
         # Save logos
         saved_files = generator.save_logos(images, brand_name, industry, style)
         
-        print(f"\n🎉 SUCCESS! Generated {len(images)} professional logos")
-        print(f"📁 Saved to: ./{brand_name.lower()}_professional_logos/")
-        print(f"\n📋 Generated files:")
+        print(f"\n SUCCESS! Generated {len(images)} professional logos")
+        print(f" Saved to: ./{brand_name.lower()}_professional_logos/")
+        print(f"\n Generated files:")
         for file in saved_files:
             print(f"   • {file}")
         
-        print(f"\n🎨 Logo files are ready to use!")
-        print(f"💡 Open them in any image viewer or design software")
+        print(f"\n Logo files are ready to use!")
+        print(f" Open them in any image viewer or design software")
         
     else:
-        print(f"\n❌ Logo generation failed")
-        print(f"💡 Check internet connection and try again")
+        print(f"\n Logo generation failed")
+        print(f" Check internet connection and try again")
 
 if __name__ == "__main__":
     main()

@@ -213,7 +213,7 @@ Format as JSON:"""
 
 def main():
     """Main function to demonstrate the brand generator"""
-    print("🎨 Local Brand Generator with Knowledge Graphs")
+    print(" Local Brand Generator with Knowledge Graphs")
     print("=" * 50)
     
     generator = LocalBrandGenerator()
@@ -222,14 +222,14 @@ def main():
     industry = input("Enter industry (e.g., tech, fashion, food): ").strip() or "tech"
     style = input("Enter style (e.g., modern, classic, playful): ").strip() or "modern"
     
-    print(f"\n🚀 Generating brand names for {industry} industry with {style} style...")
+    print(f"\n Generating brand names for {industry} industry with {style} style...")
     
     # Generate brand names
     brand_names_response = generator.generate_brand_name(industry, style)
-    print(f"\n📝 Suggested Brand Names:\n{brand_names_response}")
+    print(f"\n Suggested Brand Names:\n{brand_names_response}")
     
     # Let user select or input a brand name
-    brand_name = input("\n✏️  Enter your chosen brand name: ").strip()
+    brand_name = input("\n  Enter your chosen brand name: ").strip()
     if not brand_name:
         # Extract first name from response as fallback
         lines = brand_names_response.split('\n')
@@ -239,7 +239,7 @@ def main():
                 break
         brand_name = brand_name or "TechFlow"
     
-    print(f"\n🎯 Creating comprehensive brand identity for: {brand_name}")
+    print(f"\n Creating comprehensive brand identity for: {brand_name}")
     
     # Generate complete brand identity
     brand_identity = generator.generate_brand_identity(brand_name, industry)
@@ -248,7 +248,7 @@ def main():
     generator.create_brand_knowledge_graph(brand_identity)
     
     # Display results
-    print(f"\n✨ Brand Identity for {brand_name}:")
+    print(f"\n Brand Identity for {brand_name}:")
     print("=" * 40)
     for key, value in brand_identity.items():
         if key != "name":
@@ -262,7 +262,7 @@ def main():
     
     # Visualize knowledge graph
     try:
-        print(f"\n📊 Generating knowledge graph visualization...")
+        print(f"\n Generating knowledge graph visualization...")
         graph_path = filename.replace('.json', '_graph.png')
         generator.visualize_knowledge_graph(brand_name, graph_path)
     except Exception as e:

@@ -26,12 +26,12 @@ class AILogoGenerator:
     def load_stable_diffusion(self, model_id: str = "runwayml/stable-diffusion-v1-5"):
         """Load Stable Diffusion model for AI logo generation"""
         if not DIFFUSERS_AVAILABLE:
-            print("❌ Diffusers not available. Install with: pip install diffusers")
+            print(" Diffusers not available. Install with: pip install diffusers")
             return False
             
         try:
-            print(f"🔄 Loading Stable Diffusion model: {model_id}")
-            print("⚠️  This will download ~4GB on first run...")
+            print(f" Loading Stable Diffusion model: {model_id}")
+            print("  This will download ~4GB on first run...")
             
             # Load with optimizations for your laptop
             self.pipeline = StableDiffusionPipeline.from_pretrained(
@@ -54,12 +54,12 @@ class AILogoGenerator:
             except:
                 pass
             
-            print("✅ Stable Diffusion loaded successfully!")
+            print(" Stable Diffusion loaded successfully!")
             return True
             
         except Exception as e:
-            print(f"❌ Failed to load Stable Diffusion: {e}")
-            print("💡 You can still use programmatic logo generation!")
+            print(f" Failed to load Stable Diffusion: {e}")
+            print(" You can still use programmatic logo generation!")
             return False
     
     def generate_logo_prompt(self, brand_name: str, industry: str, 
@@ -122,7 +122,7 @@ class AILogoGenerator:
                         num_images: int = 2) -> List[Image.Image]:
         """Generate AI logos using Stable Diffusion"""
         if not self.pipeline:
-            print("❌ Stable Diffusion not loaded. Loading now...")
+            print(" Stable Diffusion not loaded. Loading now...")
             if not self.load_stable_diffusion():
                 return []
         
@@ -130,8 +130,8 @@ class AILogoGenerator:
             brand_name, industry, personality, style
         )
         
-        print(f"🎨 Generating {num_images} AI logo(s)...")
-        print(f"📝 Prompt: {positive_prompt[:100]}...")
+        print(f" Generating {num_images} AI logo(s)...")
+        print(f" Prompt: {positive_prompt[:100]}...")
         
         try:
             # Generation parameters optimized for logos
@@ -146,11 +146,11 @@ class AILogoGenerator:
                 generator=torch.manual_seed(42)  # Reproducible results
             ).images
             
-            print(f"✅ Generated {len(images)} AI logo(s)")
+            print(f" Generated {len(images)} AI logo(s)")
             return images
             
         except Exception as e:
-            print(f"❌ AI generation failed: {e}")
+            print(f" AI generation failed: {e}")
             return []
     
     def enhance_logo(self, image: Image.Image) -> Image.Image:
@@ -241,12 +241,12 @@ Make it professional, scalable, and memorable. Focus on {personality_str} charac
         return f"Ollama connection error: {e}"
 
 def main():
-    print("🤖 AI Logo Generator")
+    print(" AI Logo Generator")
     print("=" * 40)
     print("Generate professional logos using:")
-    print("1. 🎨 Local Stable Diffusion AI")
-    print("2. 🧠 Ollama concept generation")
-    print("3. 🖼️  Enhanced post-processing")
+    print("1.  Local Stable Diffusion AI")
+    print("2.  Ollama concept generation")
+    print("3.   Enhanced post-processing")
     
     # Initialize generator
     ai_gen = AILogoGenerator()
@@ -287,19 +287,19 @@ def main():
     except:
         style = "minimalist"
     
-    print(f"\n🎯 Creating logo for: {brand_name}")
-    print(f"🏢 Industry: {industry}")
-    print(f"✨ Personality: {', '.join(selected_traits)}")
-    print(f"🎨 Style: {style}")
+    print(f"\n Creating logo for: {brand_name}")
+    print(f" Industry: {industry}")
+    print(f" Personality: {', '.join(selected_traits)}")
+    print(f" Style: {style}")
     
     # Create output directory
     output_dir = f"./{brand_name.lower().replace(' ', '_')}_ai_logos"
     os.makedirs(output_dir, exist_ok=True)
     
     # Generate concept with Ollama
-    print("\n🧠 Generating professional concept with Ollama...")
+    print("\n Generating professional concept with Ollama...")
     concept = generate_logo_description_with_ollama(brand_name, industry, selected_traits)
-    print(f"\n📝 Professional Logo Concept:\n{'-' * 40}")
+    print(f"\n Professional Logo Concept:\n{'-' * 40}")
     print(concept)
     print("-" * 40)
     
@@ -315,17 +315,17 @@ def main():
         f.write("-" * 20 + "\n")
         f.write(concept)
     
-    print(f"💾 Concept saved to: {concept_file}")
+    print(f" Concept saved to: {concept_file}")
     
     # AI generation option
     if DIFFUSERS_AVAILABLE:
-        generate_ai = input("\n🤖 Generate AI logos with Stable Diffusion? (y/n): ").lower() == 'y'
+        generate_ai = input("\n Generate AI logos with Stable Diffusion? (y/n): ").lower() == 'y'
         
         if generate_ai:
             # Ask about model download
             if not ai_gen.pipeline:
-                print("\n⚠️  First run will download ~4GB Stable Diffusion model")
-                print("💡 This will take 10-30 minutes depending on internet speed")
+                print("\n  First run will download ~4GB Stable Diffusion model")
+                print(" This will take 10-30 minutes depending on internet speed")
                 confirm_download = input("Continue with download? (y/n): ").lower() == 'y'
                 
                 if not confirm_download:
@@ -336,7 +336,7 @@ def main():
                 num_logos = int(input("How many AI logos to generate? (1-4): ").strip() or "2")
                 num_logos = max(1, min(4, num_logos))
                 
-                print(f"\n🎨 Generating {num_logos} AI logo(s)...")
+                print(f"\n Generating {num_logos} AI logo(s)...")
                 print("⏰ This will take 2-10 minutes depending on your CPU...")
                 
                 ai_images = ai_gen.generate_ai_logo(
@@ -356,26 +356,26 @@ def main():
                         enhanced_path = f"{output_dir}/{brand_name.lower()}_ai_logo_{i}_enhanced.png"
                         enhanced_img.save(enhanced_path)
                         
-                        print(f"✅ Saved AI logo {i}: {enhanced_path}")
+                        print(f" Saved AI logo {i}: {enhanced_path}")
                     
-                    print(f"\n🎉 Generated {len(ai_images)} AI logos!")
+                    print(f"\n Generated {len(ai_images)} AI logos!")
                 else:
-                    print("❌ AI logo generation failed")
+                    print(" AI logo generation failed")
     else:
-        print("\n💡 To enable AI logo generation, install: pip install diffusers torch")
+        print("\n To enable AI logo generation, install: pip install diffusers torch")
     
     # Generate prompts for external AI tools
-    print(f"\n🌐 External AI Tool Prompts:")
+    print(f"\n External AI Tool Prompts:")
     print("-" * 40)
     
     if DIFFUSERS_AVAILABLE or ai_gen.pipeline:
         positive, negative = ai_gen.generate_logo_prompt(brand_name, industry, selected_traits, style)
-        print(f"🎨 DALL-E/Midjourney Prompt:")
+        print(f" DALL-E/Midjourney Prompt:")
         print(positive)
-        print(f"\n❌ Avoid: {negative}")
+        print(f"\n Avoid: {negative}")
     
-    print(f"\n📁 All files saved in: {output_dir}/")
-    print("\n🎯 Next Steps:")
+    print(f"\n All files saved in: {output_dir}/")
+    print("\n Next Steps:")
     print("1. Review generated concepts and AI logos")
     print("2. Use external AI tools with provided prompts")
     print("3. Refine designs in graphic design software")

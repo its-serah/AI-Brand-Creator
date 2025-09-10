@@ -10,24 +10,24 @@ import os
 def show_logo_examples():
     """Display information about logo generation capabilities"""
     
-    print("🎨 LOCAL LOGO GENERATION CAPABILITIES")
+    print(" LOCAL LOGO GENERATION CAPABILITIES")
     print("=" * 60)
     
-    print("\n📊 LOGO TYPES AVAILABLE:")
-    print("1. 🔷 Geometric/Abstract Logos - Modern shapes and patterns")
-    print("2. ✍️  Text-Based Logos - Typography with effects")  
-    print("3. 🔸 Industry Icon Logos - Tech, food, fitness, fashion icons")
-    print("4. 🎭 Combined Logos - Icon + text combinations")
-    print("5. 🤖 AI-Generated Logos - Using Stable Diffusion (optional)")
+    print("\n LOGO TYPES AVAILABLE:")
+    print("1.  Geometric/Abstract Logos - Modern shapes and patterns")
+    print("2.   Text-Based Logos - Typography with effects")  
+    print("3.  Industry Icon Logos - Tech, food, fitness, fashion icons")
+    print("4.  Combined Logos - Icon + text combinations")
+    print("5.  AI-Generated Logos - Using Stable Diffusion (optional)")
     
-    print("\n🎨 STYLE OPTIONS:")
+    print("\n STYLE OPTIONS:")
     print("• Modern - Clean geometric shapes")
     print("• Minimalist - Simple lines and forms")
     print("• Creative - Organic, artistic shapes") 
     print("• Shadow - Text with drop shadow effects")
     print("• Outline - Bold outline typography")
     
-    print("\n🏢 INDUSTRY SPECIALIZATIONS:")
+    print("\n INDUSTRY SPECIALIZATIONS:")
     print("• Tech - Circuit patterns, digital elements")
     print("• Food - Plates, organic shapes, appetite appeal") 
     print("• Fitness - Dumbbells, movement lines, energy")
@@ -35,11 +35,11 @@ def show_logo_examples():
     print("• Creative - Artistic elements, vibrant colors")
     print("• Professional - Corporate charts, stability")
     
-    print(f"\n📁 EXISTING LOGO EXAMPLES:")
+    print(f"\n EXISTING LOGO EXAMPLES:")
     if os.path.exists('./techflow_logos/'):
         logos = [f for f in os.listdir('./techflow_logos/') if f.endswith('.png')]
         if logos:
-            print(f"✅ Found {len(logos)} example logos in ./techflow_logos/:")
+            print(f" Found {len(logos)} example logos in ./techflow_logos/:")
             for logo in sorted(logos):
                 print(f"   • {logo}")
         else:
@@ -47,7 +47,7 @@ def show_logo_examples():
     else:
         print("   No example logos found yet")
     
-    print(f"\n🎯 HOW TO GENERATE LOGOS:")
+    print(f"\n HOW TO GENERATE LOGOS:")
     print("1. Basic Logo Generator:")
     print("   python3 logo_generator.py")
     print("   → Creates geometric, text, icon, and combined logos")
@@ -68,8 +68,8 @@ def show_logo_examples():
 def main():
     show_logo_examples()
     
-    if input("\n🎨 Try generating a quick demo logo? (y/n): ").lower() == 'y':
-        print("\n🚀 Running logo generator with demo settings...")
+    if input("\n Try generating a quick demo logo? (y/n): ").lower() == 'y':
+        print("\n Running logo generator with demo settings...")
         
         # Create a simple demo logo
         demo_input = "DemoLogo\ntech\n1,2,7\n1"  # DemoLogo, tech, modern+creative+elegant, geometric only
@@ -84,23 +84,23 @@ def main():
             )
             
             if result.returncode == 0:
-                print("✅ Demo logo generated successfully!")
+                print(" Demo logo generated successfully!")
                 if os.path.exists('./demologo_logos/'):
                     logos = [f for f in os.listdir('./demologo_logos/') if f.endswith('.png')]
-                    print(f"📁 Created {len(logos)} demo logos in ./demologo_logos/")
+                    print(f" Created {len(logos)} demo logos in ./demologo_logos/")
                     for logo in sorted(logos):
                         print(f"   • {logo}")
             else:
-                print("❌ Demo generation failed")
+                print(" Demo generation failed")
                 print(result.stderr)
         
         except subprocess.TimeoutExpired:
             print("⏰ Demo generation timed out")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f" Error: {e}")
     
-    print("\n🎉 Logo generation demo complete!")
-    print("\n📚 Next steps:")
+    print("\n Logo generation demo complete!")
+    print("\n Next steps:")
     print("1. Run logo_generator.py for full logo creation")
     print("2. Run ai_logo_generator.py for AI-generated logos") 
     print("3. Integrate with brand_generator.py for complete branding")
