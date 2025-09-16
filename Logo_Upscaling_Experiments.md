@@ -90,4 +90,6 @@ Add fine-tuning on a clean logo/text dataset to improve text clarity and vector 
 
 Combine with font rendering libraries or SVG generation for the final polished logo outputs.
 
-##Next step (future work): Fine-tune Stable Diffusion on wordmark + symbol datasets to solve text blurring.
+## Next step (future work): 
+
+Fine-tune Stable Diffusion on wordmark + symbol datasets to solve text blurring.
