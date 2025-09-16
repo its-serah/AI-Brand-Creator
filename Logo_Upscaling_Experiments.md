@@ -3,10 +3,10 @@ This repo documents experiments with two pretrained upscaling models — Real-ES
 The goal: evaluate which model is more suitable for integrating into a pipeline where users can input logo prompts, and the system generates clean, scalable outputs.
 Models Tested
 
-##1. Real-ESRGAN (x4)
+## 1. Real-ESRGAN (x4)
 ###Setup: Installed and ran the Real-ESRGAN pretrained model.
 
-###Process: Tested on four main image categories:
+### Process: Tested on four main image categories:
 Badge (text + symbol)
 
 Hexagon (geometric shape)
@@ -15,18 +15,18 @@ Eagle (natural photo)
 
 Wordmark (text logo)
 
-##Results Summary:
+## Results Summary:
 Strong on natural images (e.g., eagle feathers sharpened).
 
 Decent on simple graphics but introduced blur on geometric edges.
 
 Weak on text logos → tagline and smaller fonts became unreadable.
 
-##2. Stable Diffusion x4 Upscaler
+## 2. Stable Diffusion x4 Upscaler
 
-###Setup: Used diffusers pipeline (stabilityai/stable-diffusion-x4-upscaler) with prompt guidance.
+## Setup: Used diffusers pipeline (stabilityai/stable-diffusion-x4-upscaler) with prompt guidance.
 
-##Process: Tested on the same set of images + additional mixed logos and font examples:
+## Process: Tested on the same set of images + additional mixed logos and font examples:
 
 Badge logos
 
@@ -42,7 +42,7 @@ Lion Capital logo & multi-font Brooklyn Urban Style wordmark
 
 Complex emblem (Knights of Columbus)
 
-##Results Summary:
+## Results Summary:
 
 Preserved large text slightly better than ESRGAN but still blurred small fonts.
 
@@ -52,7 +52,7 @@ Script or decorative fonts survived better than thin serif/sans serif.
 
 Complex logos with tiny embedded text still degraded.
 
-##Comparison Table
+## Comparison Table
 | **Image Type**         | **Real-ESRGAN (x4)**                              | **Stable Diffusion x4 Upscaler**                              |
 |--------------------------|--------------------------------------------------|----------------------------------------------------------------|
 | **Badge (text + symbol)** | Outline smoothed, text blurred/unreadable         | Shape preserved, large text okay, small text still degraded      |
@@ -64,7 +64,7 @@ Complex logos with tiny embedded text still degraded.
 
 
 
-##Key Findings
+## Key Findings
 Real-ESRGAN
  - Best for natural images
  - Struggles with text & geometric precision
@@ -76,14 +76,14 @@ Stable Diffusion x4 Upscaler
 
 
 
-##Conclusion – Which Model Fits AI Brand Creator?
+## Conclusion – Which Model Fits AI Brand Creator?
 For the AI Brand Creator use case (logo generation based on user prompts):
 Real-ESRGAN is not ideal for logos, it excels at photos but fails with text.
 
 Stable Diffusion x4 Upscaler is closer to the goal, it reads larger words more correctly, handles decorative styles better, and could be fine-tuned on logo datasets to improve text rendering.
 
 
-##Recommendation:
+## Recommendation:
 Use Stable Diffusion x4 Upscaler as the base model.
 
 Add fine-tuning on a clean logo/text dataset to improve text clarity and vector sharpness.
