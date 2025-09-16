@@ -4,7 +4,7 @@ The goal: evaluate which model is more suitable for integrating into a pipeline 
 Models Tested
 
 ## 1. Real-ESRGAN (x4)
-###Setup: Installed and ran the Real-ESRGAN pretrained model.
+### Setup: Installed and ran the Real-ESRGAN pretrained model.
 
 ### Process: Tested on four main image categories:
 Badge (text + symbol)
