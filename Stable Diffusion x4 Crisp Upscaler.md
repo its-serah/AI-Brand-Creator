@@ -45,9 +45,9 @@ The notebook is split into two main cells:
 ---
 
 ## Key Parameters
-- `guidance_scale=0.5` → keeps edges sharp without hallucinations.  
-- `num_inference_steps=36` → balances quality and runtime.  
-- `noise_level=0` → crucial for preserving text clarity.  
+- `guidance_scale=0.5` -> keeps edges sharp without hallucinations.  
+- `num_inference_steps=36` -> balances quality and runtime.  
+- `noise_level=0` -> crucial for preserving text clarity.  
 - Sharpen strength (`k`) varies with preset:
   - `thin = 0.20`  
   - `neutral = 0.22`  
