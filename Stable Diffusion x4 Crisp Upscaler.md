@@ -8,7 +8,7 @@ It is tuned to minimize blurring and artifacts when enlarging images that contai
 ## Features
 - Uses **Stable Diffusion x4 Upscaler** for high-quality super-resolution.  
 - Custom prompt / negative prompt setup to avoid hallucinations.  
-- **Noise level = 0** → prevents re-blurring of text.  
+- **Noise level = 0** -> prevents re-blurring of text.  
 - Edge-aware **bilateral + Laplacian sharpening** for crisp, clean text.  
 - Three presets for different font weights:
   - `thin` -> for hairline serifs or small UI text  
