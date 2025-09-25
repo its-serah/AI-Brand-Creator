@@ -19,11 +19,21 @@ class BrandCreator {
         const createNewBtn = document.getElementById('createNewBtn');
         createNewBtn?.addEventListener('click', this.resetForm.bind(this));
 
+        // Explainability toggle
+        const explainabilityToggle = document.getElementById('explainabilityToggle');
+        explainabilityToggle?.addEventListener('click', this.toggleExplainability.bind(this));
+
         // Form validation on input change
         const requiredFields = form.querySelectorAll('[required]');
         requiredFields.forEach(field => {
             field.addEventListener('change', this.validateForm.bind(this));
             field.addEventListener('input', this.validateForm.bind(this));
+        });
+
+        // Show explainability when form is filled
+        const allInputs = form.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            input.addEventListener('change', this.updateExplainability.bind(this));
         });
     }
 
@@ -389,11 +399,76 @@ class BrandCreator {
         }, 5000);
     }
 
+    toggleExplainability() {
+        const toggle = document.getElementById('explainabilityToggle');
+        const content = document.getElementById('explainabilityContent');
+        
+        if (content.style.display === 'none' || !content.style.display) {
+            content.style.display = 'block';
+            toggle.classList.add('expanded');
+            toggle.querySelector('span').textContent = 'Hide AI Prompts';
+            this.updateExplainability();
+        } else {
+            content.style.display = 'none';
+            toggle.classList.remove('expanded');
+            toggle.querySelector('span').textContent = 'Show AI Prompts';
+        }
+    }
+
+    updateExplainability() {
+        const formData = this.collectFormData();
+        
+        // Check if form has enough data
+        if (!formData.businessName || !formData.industry || formData.personality.length === 0) {
+            document.getElementById('explainabilitySection').style.display = 'none';
+            return;
+        }
+        
+        // Show explainability section
+        document.getElementById('explainabilitySection').style.display = 'block';
+        
+        // Generate and display prompts
+        const prompt = this.buildPrompt(formData);
+        const negativePrompt = this.buildNegativePrompt(formData);
+        
+        // Update displays
+        document.getElementById('finalPromptDisplay').textContent = prompt;
+        document.getElementById('negativePromptDisplay').textContent = negativePrompt;
+        
+        // Show breakdown
+        this.showPromptBreakdown(formData, prompt, negativePrompt);
+    }
+
+    showPromptBreakdown(formData, prompt, negativePrompt) {
+        const breakdown = document.getElementById('promptBreakdown');
+        
+        const breakdownItems = [
+            { label: 'Business Name', value: formData.businessName },
+            { label: 'Industry', value: this.formatValue(formData.industry) },
+            { label: 'Logo Style', value: this.formatValue(formData.logoStyle) },
+            { label: 'Color Scheme', value: this.formatValue(formData.colorScheme) },
+            { label: 'Personality', value: formData.personality.join(', ') },
+            { label: 'Target Audience', value: this.formatValue(formData.targetAudience) }
+        ];
+        
+        if (formData.additionalNotes) {
+            breakdownItems.push({ label: 'Additional Notes', value: formData.additionalNotes });
+        }
+        
+        breakdown.innerHTML = breakdownItems.map(item => `
+            <div class="breakdown-item">
+                <div class="breakdown-label">${item.label}:</div>
+                <div class="breakdown-value">${item.value}</div>
+            </div>
+        `).join('');
+    }
+
     resetForm() {
         // Hide results and show form
         document.getElementById('resultsSection').style.display = 'none';
         document.getElementById('formSection').style.display = 'block';
         document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('explainabilitySection').style.display = 'none';
         
         // Reset form
         const form = document.getElementById('brandCreationForm');

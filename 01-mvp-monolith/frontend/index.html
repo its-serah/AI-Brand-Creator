@@ -150,6 +150,29 @@
                         </button>
                     </form>
                 </div>
+
+                <!-- Explainability Section -->
+                <div class="explainability-section" id="explainabilitySection" style="display: none;">
+                    <button class="explainability-toggle" id="explainabilityToggle">
+                        <span>Show AI Prompts</span>
+                        <span class="toggle-arrow">▼</span>
+                    </button>
+                    <div class="explainability-content" id="explainabilityContent" style="display: none;">
+                        <h3>How Your Inputs Become AI Prompts</h3>
+                        <div class="prompt-section">
+                            <h4>Final AI Prompt</h4>
+                            <div class="prompt-display" id="finalPromptDisplay"></div>
+                        </div>
+                        <div class="prompt-section">
+                            <h4>Negative Prompt (What to Avoid)</h4>
+                            <div class="prompt-display" id="negativePromptDisplay"></div>
+                        </div>
+                        <div class="prompt-breakdown">
+                            <h4>Prompt Breakdown</h4>
+                            <div id="promptBreakdown"></div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Results Section -->
