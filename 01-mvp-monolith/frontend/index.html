@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Creator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">Brand Creator</h1>
+            <p class="header-subtitle">Create stunning brand identities powered by AI</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Brand Creation Form -->
+            <section class="form-section" id="brandForm">
+                <div class="form-card">
+                    <h2 class="form-title">Tell us about your brand</h2>
+                    
+                    <form id="brandCreationForm" class="brand-form">
+                        <!-- Industry Selection -->
+                        <div class="form-group">
+                            <label for="industry">Industry</label>
+                            <select id="industry" name="industry" required>
+                                <option value="">Choose your industry</option>
+                                <option value="technology">Technology</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="finance">Finance</option>
+                                <option value="retail">Retail</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="real-estate">Real Estate</option>
+                                <option value="consulting">Consulting</option>
+                                <option value="creative">Creative Services</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Business Name -->
+                        <div class="form-group">
+                            <label for="businessName">Business Name</label>
+                            <input type="text" id="businessName" name="businessName" placeholder="Enter your business name" required>
+                        </div>
+
+                        <!-- Brand Personality -->
+                        <div class="form-group">
+                            <label>Brand Personality</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="professional">
+                                    <span>Professional</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="creative">
+                                    <span>Creative</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="friendly">
+                                    <span>Friendly</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="modern">
+                                    <span>Modern</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="trustworthy">
+                                    <span>Trustworthy</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="personality" value="innovative">
+                                    <span>Innovative</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Logo Style Preferences -->
+                        <div class="form-group">
+                            <label for="logoStyle">Logo Style</label>
+                            <select id="logoStyle" name="logoStyle" required>
+                                <option value="">Choose a style</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="geometric">Geometric</option>
+                                <option value="text-based">Text-based</option>
+                                <option value="symbolic">Symbolic</option>
+                                <option value="abstract">Abstract</option>
+                                <option value="classic">Classic</option>
+                            </select>
+                        </div>
+
+                        <!-- Color Preferences -->
+                        <div class="form-group">
+                            <label>Color Preferences</label>
+                            <div class="color-options">
+                                <label class="color-option">
+                                    <input type="radio" name="colorScheme" value="warm">
+                                    <span class="color-sample warm"></span>
+                                    <span>Warm tones</span>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="colorScheme" value="cool">
+                                    <span class="color-sample cool"></span>
+                                    <span>Cool tones</span>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="colorScheme" value="neutral">
+                                    <span class="color-sample neutral"></span>
+                                    <span>Neutral tones</span>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="colorScheme" value="vibrant">
+                                    <span class="color-sample vibrant"></span>
+                                    <span>Vibrant colors</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Target Audience -->
+                        <div class="form-group">
+                            <label for="targetAudience">Target Audience</label>
+                            <select id="targetAudience" name="targetAudience" required>
+                                <option value="">Select your audience</option>
+                                <option value="young-adults">Young Adults (18-35)</option>
+                                <option value="professionals">Professionals (25-50)</option>
+                                <option value="families">Families</option>
+                                <option value="seniors">Seniors (55+)</option>
+                                <option value="businesses">Other Businesses</option>
+                                <option value="global">Global Audience</option>
+                            </select>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <div class="form-group">
+                            <label for="additionalNotes">Additional Notes (Optional)</label>
+                            <textarea id="additionalNotes" name="additionalNotes" placeholder="Any specific requirements or ideas for your brand?" rows="4"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span>Create My Brand</span>
+                            <div class="loading-spinner" id="loadingSpinner"></div>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>Your Brand Identity</h2>
+                    <button class="create-new-btn" id="createNewBtn">Create New Brand</button>
+                </div>
+                
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Loading Section -->
+            <section class="loading-section" id="loadingSection" style="display: none;">
+                <div class="loading-card">
+                    <div class="loading-animation"></div>
+                    <h3>Creating your brand identity...</h3>
+                    <p>This may take a few moments while our AI generates your unique brand elements.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
