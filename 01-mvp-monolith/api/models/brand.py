@@ -142,6 +142,13 @@ class BrandResponse(BaseModel):
     font_suggestion: Optional[str] = None
     brand_description: Optional[str] = None
     
+    # Enhanced features
+    extracted_colors: Optional[List[str]] = None
+    color_variations_available: Optional[bool] = None
+    social_media_exports: Optional[Dict[str, Any]] = None
+    upscaling_applied: Optional[bool] = None
+    enhancement_features: Optional[List[str]] = None
+    
     class Config:
         json_encoders = {
             datetime: lambda dt: dt.isoformat()

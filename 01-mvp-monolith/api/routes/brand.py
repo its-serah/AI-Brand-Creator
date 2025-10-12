@@ -4,6 +4,7 @@ Brand generation API routes
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, EmailStr
 import logging
 from typing import Optional
 
@@ -14,6 +15,12 @@ from ..config import Settings
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+class EmailShareRequest(BaseModel):
+    """Request model for sharing brand details via email"""
+    email: str  # Using str instead of EmailStr to avoid pydantic dependency issues
+    brand_data: dict
+    message: Optional[str] = None
 
 def get_brand_service(settings: Settings = Depends(lambda: Settings())) -> BrandService:
     """Dependency to get brand service instance"""

@@ -15,6 +15,11 @@ xformers
 # Image Processing
 Pillow==10.1.0
 opencv-python==4.8.1.78
+numpy
+scikit-image
+colorthief
+webcolors
+tifffile
 
 # Database
 neo4j==5.14.1

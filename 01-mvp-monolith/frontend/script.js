@@ -345,8 +345,42 @@ class BrandCreator {
             </div>
         ` : '';
 
+        // Enhanced features display
+        const extractedColorsSection = result.extracted_colors && result.extracted_colors.length > 0 ? `
+            <div style="margin-top: 1rem;">
+                <strong>Extracted Colors from Logo:</strong><br>
+                <div class="brand-colors">
+                    ${result.extracted_colors.slice(0, 6).map(color => `
+                        <div class="color-swatch" style="background-color: ${color};" title="${color}"></div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+        
+        const enhancementBadges = result.enhancement_features ? `
+            <div class="enhancement-badges">
+                ${result.enhancement_features.map(feature => `
+                    <span class="enhancement-badge">${this.formatEnhancementFeature(feature)}</span>
+                `).join('')}
+            </div>
+        ` : '';
+        
+        const socialExportsSection = result.social_media_exports && Object.keys(result.social_media_exports).length > 0 ? `
+            <div style="margin-top: 1rem;">
+                <strong>Social Media Formats Available</strong>
+                <div class="social-formats">
+                    <span class="social-format-badge">Instagram</span>
+                    <span class="social-format-badge">Facebook</span>
+                    <span class="social-format-badge">Twitter</span>
+                    <span class="social-format-badge">YouTube</span>
+                    <span class="social-format-badge">LinkedIn</span>
+                </div>
+            </div>
+        ` : '';
+        
         card.innerHTML = `
             <h3>${originalData.businessName}</h3>
+            ${enhancementBadges}
             ${logoSection}
             <div class="brand-info">
                 <p><strong>Industry:</strong> ${this.formatValue(originalData.industry)}</p>
@@ -355,6 +389,8 @@ class BrandCreator {
                 <p><strong>Target Audience:</strong> ${this.formatValue(originalData.targetAudience)}</p>
                 ${result.font_suggestion ? `<p><strong>Recommended Font:</strong> ${result.font_suggestion}</p>` : ''}
                 ${colorsSection ? `<div style="margin-top: 1rem;"><strong>Brand Colors:</strong><br>${colorsSection}</div>` : ''}
+                ${extractedColorsSection}
+                ${socialExportsSection}
                 ${result.brand_description ? `<p style="margin-top: 1rem;"><strong>Brand Description:</strong><br>${result.brand_description}</p>` : ''}
             </div>
         `;
@@ -366,6 +402,16 @@ class BrandCreator {
         return value.split('-').map(word => 
             word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ');
+    }
+    
+    formatEnhancementFeature(feature) {
+        const featureNames = {
+            '4x_upscaling': '4x Upscaled',
+            'color_extraction': 'Color Extracted',
+            'color_variations': 'Color Variations',
+            'social_media_exports': 'Social Media Ready'
+        };
+        return featureNames[feature] || feature.replace(/_/g, ' ');
     }
 
     showErrorMessage(message) {

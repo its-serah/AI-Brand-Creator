@@ -556,6 +556,45 @@ body {
     flex-grow: 1;
 }
 
+/* Enhancement Badges */
+.enhancement-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.enhancement-badge {
+    background: var(--burnt-orange);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Social Media Formats */
+.social-formats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.social-format-badge {
+    background: var(--soft-beige);
+    color: var(--deep-maroon);
+    font-size: 0.8rem;
+    font-weight: 400;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
