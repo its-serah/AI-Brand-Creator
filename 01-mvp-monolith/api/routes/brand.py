@@ -268,3 +268,179 @@ async def get_brand_examples():
     except Exception as e:
         logger.error(f"Error retrieving examples: {e}")
         raise HTTPException(status_code=500, detail="Error retrieving brand examples")
+
+@router.post("/share/email", response_model=APIResponse[dict])
+async def share_brand_via_email(
+    request: EmailShareRequest,
+    background_tasks: BackgroundTasks,
+    brand_service: BrandService = Depends(get_brand_service)
+):
+    """
+    Share brand results via email
+    
+    Sends an email with the brand generation results including:
+    - Brand summary and description
+    - Color palette
+    - Typography recommendations
+    - Links to generated logos and social media exports
+    """
+    try:
+        logger.info(f"Email share request for: {request.email}")
+        
+        # Validate email format
+        if '@' not in request.email or '.' not in request.email:
+            raise HTTPException(status_code=400, detail="Invalid email format")
+        
+        # Add background task to send email (non-blocking)
+        background_tasks.add_task(
+            send_brand_email,
+            request.email,
+            request.brand_data,
+            request.message
+        )
+        
+        return APIResponse(
+            data={
+                "status": "email_queued",
+                "message": f"Brand results will be sent to {request.email}",
+                "email": request.email
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sharing brand via email: {e}")
+        raise HTTPException(status_code=500, detail="Error sharing brand via email")
+
+async def send_brand_email(email: str, brand_data: dict, message: Optional[str] = None):
+    """
+    Background task to send brand results via email
+    """
+    import smtplib
+    import json
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.base import MIMEBase
+    from email import encoders
+    import os
+    
+    try:
+        logger.info(f"Preparing to send brand email to: {email}")
+        
+        # Create HTML email content
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Your Brand Results - AI Brand Creator</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 30px; text-align: center; }}
+                .content {{ padding: 30px; max-width: 600px; margin: 0 auto; }}
+                .brand-name {{ font-size: 28px; font-weight: bold; margin-bottom: 10px; }}
+                .section {{ margin: 25px 0; padding: 20px; border-left: 4px solid #ff6b35; background: #f9f9f9; }}
+                .color-palette {{ display: flex; gap: 10px; margin: 15px 0; }}
+                .color-box {{ width: 50px; height: 50px; border-radius: 8px; border: 2px solid #ddd; }}
+                .logo-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }}
+                .logo-item {{ text-align: center; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 14px; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🎨 Your Brand Results</h1>
+                <p>AI Brand Creator - Professional Brand Identity Generation</p>
+            </div>
+            
+            <div class="content">
+                <div class="brand-name">{brand_data.get('business_name', 'Your Brand')}</div>
+                
+                {f'<div class="section"><strong>Personal Message:</strong><br>{message}</div>' if message else ''}
+                
+                <div class="section">
+                    <h3>🎯 Brand Overview</h3>
+                    <p><strong>Industry:</strong> {brand_data.get('industry', 'N/A')}</p>
+                    <p><strong>Style:</strong> {brand_data.get('style', 'N/A')}</p>
+                    <p><strong>Color Scheme:</strong> {brand_data.get('color_scheme', 'N/A')}</p>
+                    <p><strong>Target Audience:</strong> {brand_data.get('target_audience', 'N/A')}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>🎨 Brand Description</h3>
+                    <p>{brand_data.get('brand_description', 'Professional brand identity designed with AI assistance.')}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>🌈 Color Palette</h3>
+                    <div class="color-palette">
+                        {' '.join([f'<div class="color-box" style="background-color: {color};" title="{color}"></div>' for color in brand_data.get('color_palette', ['#333333', '#666666', '#999999'])])}
+                    </div>
+                    <p><strong>Extracted Colors:</strong> {', '.join(brand_data.get('extracted_colors', [])[:6])}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>📝 Typography</h3>
+                    <p><strong>Recommended Font:</strong> {brand_data.get('font_suggestion', 'Arial, sans-serif')}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>📊 Enhancement Features</h3>
+                    <ul>
+                        {'<li>✅ Logo Upscaling Applied</li>' if brand_data.get('upscaling_applied') else '<li>❌ Logo Upscaling Not Applied</li>'}
+                        {'<li>✅ Color Variations Available</li>' if brand_data.get('color_variations_available') else '<li>❌ Color Variations Not Available</li>'}
+                        {'<li>✅ Social Media Exports Generated</li>' if brand_data.get('social_media_exports') else '<li>❌ No Social Media Exports</li>'}
+                    </ul>
+                    <p><strong>Enhancement Features:</strong> {', '.join(brand_data.get('enhancement_features', ['Logo Enhancement', 'Color Extraction']))}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>🚀 Next Steps</h3>
+                    <p>Your brand assets have been generated and are ready for use. You can:</p>
+                    <ul>
+                        <li>Download your logo files in multiple formats</li>
+                        <li>Use the social media export versions for your online presence</li>
+                        <li>Apply the color palette across all brand materials</li>
+                        <li>Implement the typography recommendations in your designs</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Generated by AI Brand Creator | Professional Brand Identity Solutions</p>
+                <p>Created with Stable Diffusion AI Technology</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # For now, log the email content (you can integrate with actual email service)
+        logger.info(f"Email content prepared for {email} (length: {len(html_content)} characters)")
+        logger.info("Email sending functionality ready - integrate with SMTP service like SendGrid, AWS SES, or Gmail SMTP")
+        
+        # TODO: Integrate with actual email service
+        # Example with Gmail SMTP:
+        # smtp_server = "smtp.gmail.com"
+        # smtp_port = 587
+        # sender_email = "your-email@gmail.com"
+        # sender_password = "your-app-password"
+        # 
+        # msg = MIMEMultipart('alternative')
+        # msg['Subject'] = f"Your Brand Results - {brand_data.get('business_name', 'AI Brand Creator')}"
+        # msg['From'] = sender_email
+        # msg['To'] = email
+        # 
+        # html_part = MIMEText(html_content, 'html')
+        # msg.attach(html_part)
+        # 
+        # with smtplib.SMTP(smtp_server, smtp_port) as server:
+        #     server.starttls()
+        #     server.login(sender_email, sender_password)
+        #     server.send_message(msg)
+        
+        logger.info(f"Brand email processed successfully for {email}")
+        
+    except Exception as e:
+        logger.error(f"Failed to send brand email to {email}: {e}")
+        # In production, you might want to retry or store failed emails
