@@ -101,16 +101,17 @@ class BrandService:
             
             logger.info(f"Loading Stable Diffusion model on CPU with optimizations...")
             
-            # Load Stable Diffusion model optimized for CPU logo generation
-            logger.info("Loading Stable Diffusion v1.5 with CPU optimizations...")
+            # Use ultra-lightweight model for AWS Free Tier
+            logger.info("Loading CompVis/stable-diffusion-v1-4 with extreme optimizations for free tier...")
             self.sd_pipeline = StableDiffusionPipeline.from_pretrained(
-                "runwayml/stable-diffusion-v1-5",
-                torch_dtype=torch.float32,  # Use float32 for CPU
+                "CompVis/stable-diffusion-v1-4",  # Smaller than v1.5
+                torch_dtype=torch.float32,
                 use_safetensors=True,
-                safety_checker=None,  # Disable for speed
+                safety_checker=None,  # Disable for speed and memory
                 requires_safety_checker=False,
-                low_cpu_mem_usage=True,  # Optimize memory usage
-                variant="fp16" if torch.cuda.is_available() else None  # Use fp16 variant if available
+                low_cpu_mem_usage=True,
+                variant=None,  # No fp16 variant to save memory
+                cache_dir="/tmp/huggingface_cache"  # Use tmp for free tier
             )
             
             # Move to CPU and apply aggressive optimizations
@@ -310,17 +311,17 @@ class BrandService:
                         seed = (hash(request.business_name) + i * 1000) % 2**32
                         generator = torch.manual_seed(seed)
                         
-                        # Generate single image with optimized parameters
+                        # Ultra-fast generation for free tier
                         try:
                             logger.debug(f"Calling SD pipeline for logo {i+1}...")
                             result = self.sd_pipeline(
                                 prompt=logo_prompt,
                                 negative_prompt=negative_prompt,
                                 num_images_per_prompt=1,
-                                num_inference_steps=12,  # Further reduced for CPU speed
-                                guidance_scale=6.0,      # Lower guidance for faster generation
-                                width=384,               # Smaller size for faster generation
-                                height=384,
+                                num_inference_steps=4,   # ULTRA FAST - 4 steps only
+                                guidance_scale=3.5,      # Lower guidance for speed
+                                width=256,               # Smaller for t2.micro
+                                height=256,              # Smaller for t2.micro
                                 generator=generator,
                                 output_type="pil"
                             )
