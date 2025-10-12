@@ -59,7 +59,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router, prefix="/health", tags=["health"])
-app.include_router(brand.router, prefix="/api/v1/brand", tags=["brand"])
+app.include_router(brand.router, prefix="/v1/brand", tags=["brand"])
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
