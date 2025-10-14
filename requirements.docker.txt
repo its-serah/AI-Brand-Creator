@@ -1,20 +1,22 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
+
 pydantic==2.5.0
 pydantic-settings==2.0.3
+webcolors>=1.13
 python-multipart==0.0.6
 requests
+numpy==1.26.4
+Pillow==10.1.0
+opencv-python-headless==4.8.1.78
 
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
-accelerate==0.24.1
+# PyTorch (CUDA 12.1) for Cloud Run GPU
+torch==2.1.0+cu121
+torchvision==0.16.0+cu121
+--extra-index-url https://download.pytorch.org/whl/cu121
+
 diffusers==0.24.0
 transformers==4.36.0
 huggingface-hub==0.20.3
+accelerate==0.24.1
 controlnet-aux==0.0.10
-Pillow==10.1.0
-numpy==1.26.4
-opencv-python-headless==4.8.1.78
-webcolors>=1.13
