@@ -51,3 +51,12 @@ mypy==1.7.1
 # Monitoring
 prometheus-client==0.19.0
 structlog==23.2.0
+
+# runtime deps
+pydantic-settings
+webcolors
+
+pydantic-settings
+webcolors
+pydantic-settings>=2.0.0
+webcolors>=1.13
