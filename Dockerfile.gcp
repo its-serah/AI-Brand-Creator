@@ -1,0 +1,40 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+# sys deps (opencv/torch/etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential git ffmpeg libgl1 libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+# HF caches (kept in ephemeral disk)
+ENV HF_HOME=/root/.cache/huggingface \
+    TRANSFORMERS_CACHE=/var/tmp/hfcache \
+    MODEL_CACHE_DIR=/var/tmp/hfcache
+RUN mkdir -p /var/tmp/hfcache
+
+WORKDIR /app
+
+# install Python deps
+COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+# sanity check for the ones that were missing
+RUN python - <<'PY'
+import pkgutil
+missing=[m for m in ("pydantic_settings","webcolors") if not pkgutil.find_loader(m)]
+assert not missing, f"Missing deps: {missing}"
+print("deps ok")
+PY
+
+# app code
+COPY . /app
+
+# run from module root
+WORKDIR /app/01-mvp-monolith
+EXPOSE 8080
+# Use Cloud Run's PORT
+CMD ["bash","-lc","uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
