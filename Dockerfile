@@ -1,34 +1,32 @@
 FROM python:3.11-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg git && \
-    rm -rf /var/lib/apt/lists/*
-
-# HF cache inside the image (fast cold starts)
-ENV HF_HOME=/models/hf \
+ENV DEBIAN_FRONTEND=noninteractive \
+    HF_HOME=/models/hf \
     HUGGINGFACE_HUB_CACHE=/models/hf/hub \
     PYTHONUNBUFFERED=1
 
+# + OpenCV runtime libs to avoid libGL errors
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg git libgl1 libglib2.0-0 \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Python deps
+# Python deps (no-cache to keep layers small)
 COPY requirements.docker.txt /app/
-RUN pip install --upgrade pip && pip install -r requirements.docker.txt
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.docker.txt
 
-# --- Prewarm model weights (optional but recommended) ---
+# (Optional) bake models into the image. Remove if you want smaller images.
 COPY _hf_warmup.py /app/
 RUN python _hf_warmup.py || true
-# --------------------------------------------------------
 
 # App code
 COPY . /app
 
-# App module path
-ENV PYTHONPATH=/app/01-mvp-monolith
-ENV PORT=8080
+# Runtime
+ENV PYTHONPATH=/app/01-mvp-monolith \
+    PORT=8080
 EXPOSE 8080
-
-# Run API (use Cloud Run $PORT)
 WORKDIR /app/01-mvp-monolith
 CMD ["sh","-c","python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080} --no-server-header"]

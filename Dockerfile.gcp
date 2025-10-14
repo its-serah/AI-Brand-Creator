@@ -1,22 +1,39 @@
 # syntax=docker/dockerfile:1
-FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
-    HF_HOME=/root/.cache/huggingface TRANSFORMERS_CACHE=/var/tmp/hfcache \
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/root/.cache/huggingface \
+    TRANSFORMERS_CACHE=/var/tmp/hfcache \
     MODEL_CACHE_DIR=/var/tmp/hfcache
 
+# minimal system deps for OpenCV/ffmpeg etc.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /var/tmp/hfcache
+    build-essential git ffmpeg libgl1 libglib2.0-0 \
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir -p /var/tmp/hfcache
 
 WORKDIR /app
-COPY 01-mvp-monolith/requirements.gpu.txt /tmp/requirements.txt
-# torch/torchvision already in base – do NOT reinstall them
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
+# install your app deps + CUDA wheels
+COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
+RUN python -m pip install --upgrade pip setuptools wheel \
+ && pip install --no-cache-dir -r /tmp/requirements.txt \
+      --extra-index-url https://download.pytorch.org/whl/cu121 \
+ && python - <<'PY'
+import importlib.util as iu
+missing=[m for m in("pydantic_settings","webcolors") if iu.find_spec(m) is None]
+assert not missing, f"Missing deps: {missing}"
+print("deps ok (GPU build)")
+PY
+
+# app code
 COPY 01-mvp-monolith /app/01-mvp-monolith
+
+# runtime
 WORKDIR /app/01-mvp-monolith
 ENV PYTHONPATH=/app/01-mvp-monolith
 EXPOSE 8080
-CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","${PORT:-8080}"]
+CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","8080"]
 
