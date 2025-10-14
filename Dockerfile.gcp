@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     HF_HOME=/root/.cache/huggingface \
     TRANSFORMERS_CACHE=/var/tmp/hfcache \
-    MODEL_CACHE_DIR=/var/tmp/hfcache
+    MODEL_CACHE_DIR=/var/tmp/hfcache \
+    PORT=8080
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential git ffmpeg libgl1 libglib2.0-0 && \
@@ -14,9 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# deps first (better layer cache)
+# install deps (CPU-only if torch/torchvision present)
 COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel && \
+    PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
     python - <<'PY'
 import importlib.util as iu
@@ -25,11 +27,10 @@ assert not missing, f"Missing deps: {missing}"
 print("deps ok")
 PY
 
-# app code only (no model blobs)
+# app code
 COPY 01-mvp-monolith /app/01-mvp-monolith
-
-WORKDIR /app/01-mvp-monolith
 ENV PYTHONPATH=/app/01-mvp-monolith
+WORKDIR /app/01-mvp-monolith
 
 EXPOSE 8080
-CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","8080"]
+CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","8080","--no-server-header"]
