@@ -1,40 +1,37 @@
+# syntax=docker/dockerfile:1
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
-
-# sys deps (opencv/torch/etc.)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential git ffmpeg libgl1 libglib2.0-0 && \
-    rm -rf /var/lib/apt/lists/*
-
-# HF caches (kept in ephemeral disk)
-ENV HF_HOME=/root/.cache/huggingface \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/root/.cache/huggingface \
     TRANSFORMERS_CACHE=/var/tmp/hfcache \
     MODEL_CACHE_DIR=/var/tmp/hfcache
-RUN mkdir -p /var/tmp/hfcache
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential git ffmpeg libgl1 libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /var/tmp/hfcache
 
 WORKDIR /app
 
-# install Python deps
+# Install deps first for better layer caching
 COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
-RUN python -m pip install --upgrade pip && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
-
-# sanity check for the ones that were missing
-RUN python - <<'PY'
-import pkgutil
-missing=[m for m in ("pydantic_settings","webcolors") if not pkgutil.find_loader(m)]
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    python - <<'PY'
+import importlib.util as iu
+missing=[m for m in("pydantic_settings","webcolors") if iu.find_spec(m) is None]
 assert not missing, f"Missing deps: {missing}"
 print("deps ok")
 PY
 
-# app code
-COPY . /app
+# App code
+COPY 01-mvp-monolith /app/01-mvp-monolith
 
-# run from module root
+# Run from module root
 WORKDIR /app/01-mvp-monolith
+ENV PYTHONPATH=/app/01-mvp-monolith:$PYTHONPATH
+
 EXPOSE 8080
-# Use Cloud Run's PORT
 CMD ["bash","-lc","uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
