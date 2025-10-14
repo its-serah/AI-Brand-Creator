@@ -10,12 +10,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential git ffmpeg libgl1 libglib2.0-0 && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /var/tmp/hfcache
+    rm -rf /var/lib/apt/lists/* && mkdir -p /var/tmp/hfcache
 
 WORKDIR /app
 
-# Install deps first for better layer caching
+# deps first (better layer cache)
 COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
@@ -26,12 +25,11 @@ assert not missing, f"Missing deps: {missing}"
 print("deps ok")
 PY
 
-# App code
+# app code only (no model blobs)
 COPY 01-mvp-monolith /app/01-mvp-monolith
 
-# Run from module root
 WORKDIR /app/01-mvp-monolith
-ENV PYTHONPATH=/app/01-mvp-monolith:$PYTHONPATH
+ENV PYTHONPATH=/app/01-mvp-monolith
 
 EXPOSE 8080
-CMD ["bash","-lc","uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","8080"]
