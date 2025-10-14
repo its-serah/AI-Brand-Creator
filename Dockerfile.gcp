@@ -1,44 +1,22 @@
 # syntax=docker/dockerfile:1
-FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    HF_HOME=/root/.cache/huggingface \
-    TRANSFORMERS_CACHE=/var/tmp/hfcache \
-    MODEL_CACHE_DIR=/var/tmp/hfcache \
-    NVIDIA_VISIBLE_DEVICES=all \
-    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    HF_HOME=/root/.cache/huggingface TRANSFORMERS_CACHE=/var/tmp/hfcache \
+    MODEL_CACHE_DIR=/var/tmp/hfcache
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-venv python3-pip \
-    build-essential git ffmpeg libgl1 libglib2.0-0 \
- && rm -rf /var/lib/apt/lists/* \
- && mkdir -p /var/tmp/hfcache
+    ffmpeg libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /var/tmp/hfcache
 
 WORKDIR /app
+COPY 01-mvp-monolith/requirements.gpu.txt /tmp/requirements.txt
+# torch/torchvision already in base – do NOT reinstall them
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# deps first for better layer cache
-COPY 01-mvp-monolith/requirements.txt /tmp/requirements.txt
-RUN python3 -m venv /opt/venv \
- && . /opt/venv/bin/activate \
- && pip install --upgrade pip setuptools wheel \
- && pip install --no-cache-dir -r /tmp/requirements.txt \
- && python - <<'PY'
-import importlib.util as iu
-missing=[m for m in ("pydantic_settings","webcolors") if iu.find_spec(m) is None]
-assert not missing, f"Missing deps: {missing}"
-print("deps ok")
-PY
-
-# app code
 COPY 01-mvp-monolith /app/01-mvp-monolith
-
-# default to venv + module path
-ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONPATH=/app/01-mvp-monolith
-
 WORKDIR /app/01-mvp-monolith
+ENV PYTHONPATH=/app/01-mvp-monolith
 EXPOSE 8080
-CMD ["uvicorn","api.main:app","--host","0.0.0.0","--port","8080","--no-server-header"]
+CMD ["python","-m","uvicorn","api.main:app","--host","0.0.0.0","--port","${PORT:-8080}"]
+
