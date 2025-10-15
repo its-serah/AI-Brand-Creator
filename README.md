@@ -1,6 +1,8 @@
-# Brand Generator System Design Boilerplate
+# AI Brand Creator
 
-A comprehensive collection of system design approaches for building an AI-powered Brand Creator platform. This repository provides four different architectural patterns, each optimized for different use cases, scales, and operational requirements.
+A comprehensive AI-powered brand generation platform with multiple architectural approaches. This repository provides four production-ready system designs, each optimized for different use cases, scales, and operational requirements.
+
+Generate complete brand kits including logos, color palettes, fonts, and design rationale using SDXL models, ControlNet, and intelligent prompt engineering.
 
 ## System Overview
 
@@ -17,45 +19,41 @@ The AI Brand Creator generates complete brand kits including logos, color palett
 
 ## Architecture Options Comparison
 
-| Architecture | Best For | Complexity | Cost | Scale |
-|-------------|----------|------------|------|-------|
-| [MVP Monolith](./01-mvp-monolith/) | Hackathons, demos, early pilots | Low | Low | Small |
-| [Queue-Centric Modular](./02-queue-centric-modular/) | First production users (100-1K) | Medium | Medium | Medium |
-| [Serverless-First](./03-serverless-first/) | Spiky traffic, tight budget | Medium | Variable | High |
-| [Microservices + Streaming](./04-microservices-streaming/) | Continuous experiments at scale | High | High | Very High |
+| Architecture | Best For | Complexity | Cost | Scale | GCP Support |
+|-------------|----------|------------|------|-------|-------------|
+| [MVP Monolith](./architectures/mvp-monolith/) | Demos, hackathons, prototypes | Low | Low | Small | Yes |
+| [Queue-Centric](./architectures/queue-centric/) | Production (100-1K users) | Medium | Medium | Medium | Yes |
+| [Serverless](./architectures/serverless/) | Variable traffic, cost optimization | Medium | Variable | High | Yes |
+| [Microservices](./architectures/microservices/) | Enterprise scale, continuous deployment | High | High | Very High | Yes |
 
 ## Repository Structure
 
 ```
-├── 01-mvp-monolith/              # Single deployable app approach
-│   ├── README.md                 # Architecture rationale & setup
-│   ├── api/                      # FastAPI application
-│   ├── workers/                  # GPU processing workers
-│   ├── docker-compose.yml        # Local development setup
-│   └── deploy/                   # Deployment configurations
-│
-├── 02-queue-centric-modular/     # Balanced production approach
-│   ├── README.md                 # Architecture rationale & setup
-│   ├── api-service/              # API gateway service
-│   ├── logo-gen-service/         # GPU-based logo generation
-│   ├── palette-service/          # Color palette recommendations
-│   ├── rationale-service/        # LLM-based design rationale
-│   ├── pdf-service/              # Brand kit PDF generation
-│   └── infrastructure/           # IaC templates
-│
-├── 03-serverless-first/          # Event-driven, cost-optimized
-│   ├── README.md                 # Architecture rationale & setup
-│   ├── functions/                # Lambda/Cloud Functions
-│   ├── workflows/                # Step Functions/Cloud Workflows
-│   ├── gpu-jobs/                 # Containerized GPU workloads
-│   └── terraform/                # Infrastructure as Code
-│
-└── 04-microservices-streaming/   # Full-scale enterprise approach
-    ├── README.md                 # Architecture rationale & setup
-    ├── services/                 # Individual microservices
-    ├── streaming/                # Kafka/PubSub configurations
-    ├── k8s/                      # Kubernetes manifests
-    └── observability/            # Monitoring & logging
+├── architectures/               # Architecture implementations
+│   ├── mvp-monolith/           # Single deployable application
+│   │   ├── api/                # FastAPI backend
+│   │   ├── frontend/           # Web interface
+│   │   ├── docker-compose.yml  # Local development
+│   │   └── gcp/               # Google Cloud deployment
+│   ├── queue-centric/         # Production-ready with queues
+│   │   ├── services/          # Microservices
+│   │   ├── infrastructure/    # Infrastructure as Code
+│   │   └── gcp/              # GCP-specific configs
+│   ├── serverless/            # Event-driven architecture
+│   │   ├── functions/         # Cloud Functions
+│   │   ├── workflows/         # Cloud Workflows
+│   │   └── terraform/         # Terraform configs
+│   └── microservices/         # Full enterprise setup
+│       ├── services/          # Individual services
+│       ├── k8s/              # Kubernetes manifests
+│       └── monitoring/        # Observability stack
+├── docs/                      # Comprehensive documentation
+│   ├── GCP_SETUP.md          # Google Cloud Platform guide
+│   ├── API.md                # API documentation
+│   └── DEPLOYMENT.md         # Deployment guides
+└── scripts/                   # Deployment and utility scripts
+    ├── deploy-gcp.sh         # GCP deployment
+    └── setup-env.sh          # Environment setup
 ```
 
 ## Quick Start Guide
