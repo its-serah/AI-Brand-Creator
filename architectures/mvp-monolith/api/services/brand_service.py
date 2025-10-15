@@ -12,19 +12,19 @@ import io
 import base64
 import os
 
+import tempfile
+import webcolors
+
 try:
     from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
     import torch
     import numpy as np
     from skimage import color, filters
     from colorthief import ColorThief
-    import tempfile
-    import webcolors
     DIFFUSERS_AVAILABLE = True
 except ImportError:
     DIFFUSERS_AVAILABLE = False
     import numpy as np
-    import webcolors
 
 from ..models.brand import (
     BrandRequest, BrandResponse, LogoResult, 
@@ -238,8 +238,18 @@ class BrandService:
                 if 'enhancement_features' in logo.metadata:
                     enhancement_features.update(logo.metadata['enhancement_features'])
             
-            # Remove duplicates from extracted colors
-            unique_extracted_colors = list(dict.fromkeys(all_extracted_colors))
+            # Remove duplicates from extracted colors (handle dict objects properly)
+            unique_extracted_colors = []
+            seen_colors = set()
+            for color_info in all_extracted_colors:
+                if isinstance(color_info, dict) and 'hex' in color_info:
+                    hex_color = color_info['hex']
+                    if hex_color not in seen_colors:
+                        seen_colors.add(hex_color)
+                        unique_extracted_colors.append(color_info)
+                elif isinstance(color_info, str) and color_info not in seen_colors:
+                    seen_colors.add(color_info)
+                    unique_extracted_colors.append(color_info)
             
             response = BrandResponse(
                 job_id=job_id,

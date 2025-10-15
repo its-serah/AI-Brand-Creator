@@ -120,3 +120,6 @@ docs/_build/
 # Node modules (if any frontend JS dependencies)
 node_modules/
 npm-debug.log*
+
+# Local Netlify folder
+.netlify
