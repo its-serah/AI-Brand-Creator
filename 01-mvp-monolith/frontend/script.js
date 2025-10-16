@@ -1,26 +1,7 @@
-// BrandForge AI - Enhanced Frontend JavaScript
+// Brand Creator Frontend JavaScript
 class BrandCreator {
     constructor() {
-        this.apiBaseUrl = 'https://brand-api-gpu-905163229563.us-central1.run.app/api/v1';
-        this.currentTipIndex = 0;
-        this.quoteIndex = 0;
-        this.musicPlaying = false;
-        this.currentResults = null;
-        
-        // Inspirational quotes for loading
-        this.quotes = [
-            { quote: "A brand is no longer what we tell the consumer it is—it is what consumers tell each other it is.", author: "Scott Cook, Intuit" },
-            { quote: "Your brand is what other people say about you when you're not in the room.", author: "Jeff Bezos, Amazon" },
-            { quote: "Products are made in a factory, but brands are created in the mind.", author: "Walter Landor" },
-            { quote: "A logo doesn't sell (directly), it identifies.", author: "Paul Rand" },
-            { quote: "The aim of marketing is to know and understand the customer so well the product or service fits him and sells itself.", author: "Peter Drucker" },
-            { quote: "Brand is just a perception, and perception will match reality over time.", author: "Elon Musk" },
-            { quote: "A brand for a company is like a reputation for a person.", author: "Jeff Bezos" },
-            { quote: "The best marketing doesn't feel like marketing.", author: "Tom Fishburne" },
-            { quote: "Make it simple. Make it memorable. Make it inviting to look at. Make it fun to read.", author: "Leo Burnett" },
-            { quote: "Good design is obvious. Great design is transparent.", author: "Joe Sparano" }
-        ];
-        
+        this.apiBaseUrl = 'http://localhost:8000/api/v1';
         this.init();
     }
 
@@ -34,27 +15,10 @@ class BrandCreator {
         const form = document.getElementById('brandCreationForm');
         form.addEventListener('submit', this.handleFormSubmit.bind(this));
 
-        // Enhanced action buttons
+        // Create new brand button
         const createNewBtn = document.getElementById('createNewBtn');
         createNewBtn?.addEventListener('click', this.resetForm.bind(this));
-        
-        const tryAgainBtn = document.getElementById('tryAgainBtn');
-        tryAgainBtn?.addEventListener('click', this.tryAgain.bind(this));
-        
-        const emailResultsBtn = document.getElementById('emailResultsBtn');
-        emailResultsBtn?.addEventListener('click', this.showEmailModal.bind(this));
 
-        // Email modal events
-        const closeEmailModal = document.getElementById('closeEmailModal');
-        closeEmailModal?.addEventListener('click', this.hideEmailModal.bind(this));
-        
-        const emailForm = document.getElementById('emailForm');
-        emailForm?.addEventListener('submit', this.handleEmailSubmit.bind(this));
-        
-        // Music toggle
-        const musicToggle = document.getElementById('musicToggle');
-        musicToggle?.addEventListener('click', this.toggleMusic.bind(this));
-        
         // Explainability toggle
         const explainabilityToggle = document.getElementById('explainabilityToggle');
         explainabilityToggle?.addEventListener('click', this.toggleExplainability.bind(this));
@@ -70,14 +34,6 @@ class BrandCreator {
         const allInputs = form.querySelectorAll('input, select, textarea');
         allInputs.forEach(input => {
             input.addEventListener('change', this.updateExplainability.bind(this));
-        });
-        
-        // Close modal on outside click
-        const emailModal = document.getElementById('emailModal');
-        emailModal?.addEventListener('click', (e) => {
-            if (e.target === emailModal) {
-                this.hideEmailModal();
-            }
         });
     }
 
@@ -122,9 +78,6 @@ class BrandCreator {
         console.log('Generated Prompt:', prompt);
         console.log('Generated Negative Prompt:', negativePrompt);
 
-        // Show loading with enhanced experience
-        this.showEnhancedLoading();
-        
         await this.submitBrandRequest({
             ...formData,
             prompt,
@@ -655,192 +608,6 @@ function enhanceAccessibility() {
         });
     });
 }
-
-// Enhanced loading and interactive methods for BrandCreator class
-BrandCreator.prototype.showEnhancedLoading = function() {
-    const loadingSection = document.getElementById('loadingSection');
-    const formSection = document.getElementById('brandForm');
-    
-    formSection.style.display = 'none';
-    loadingSection.style.display = 'flex';
-    
-    this.startQuoteRotation();
-    this.startTipCarousel();
-    this.animateProgress();
-};
-
-BrandCreator.prototype.startQuoteRotation = function() {
-    const quoteElement = document.getElementById('inspirationalQuote');
-    const authorElement = document.getElementById('quoteAuthor');
-    
-    const rotateQuote = () => {
-        const quote = this.quotes[this.quoteIndex];
-        quoteElement.textContent = `"${quote.quote}"`;
-        authorElement.textContent = `— ${quote.author}`;
-        this.quoteIndex = (this.quoteIndex + 1) % this.quotes.length;
-    };
-    
-    rotateQuote();
-    this.quoteInterval = setInterval(rotateQuote, 8000);
-};
-
-BrandCreator.prototype.startTipCarousel = function() {
-    const tips = document.querySelectorAll('.tip-card');
-    
-    const rotateTips = () => {
-        tips.forEach((tip, index) => {
-            tip.classList.toggle('active', index === this.currentTipIndex);
-        });
-        this.currentTipIndex = (this.currentTipIndex + 1) % tips.length;
-    };
-    
-    this.tipInterval = setInterval(rotateTips, 5000);
-};
-
-BrandCreator.prototype.animateProgress = function() {
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const loadingTitle = document.getElementById('loadingTitle');
-    const loadingSubtitle = document.getElementById('loadingSubtitle');
-    
-    const steps = [
-        { progress: 15, title: "Initializing design intelligence", subtitle: "Loading AI models and design databases" },
-        { progress: 30, title: "Analyzing brand requirements", subtitle: "Processing industry context and target audience" },
-        { progress: 50, title: "Generating design concepts", subtitle: "Creating unique visual identities" },
-        { progress: 70, title: "Applying design psychology", subtitle: "Optimizing colors, typography, and composition" },
-        { progress: 85, title: "Refining brand elements", subtitle: "Ensuring scalability and professional standards" },
-        { progress: 100, title: "Brand identity complete", subtitle: "Your professional brand system is ready" }
-    ];
-    
-    let currentStep = 0;
-    
-    const updateProgress = () => {
-        if (currentStep < steps.length) {
-            const step = steps[currentStep];
-            progressFill.style.width = step.progress + '%';
-            if (progressText) progressText.textContent = step.progress + '%';
-            loadingTitle.textContent = step.title;
-            loadingSubtitle.textContent = step.subtitle;
-            currentStep++;
-        }
-    };
-    
-    this.progressInterval = setInterval(updateProgress, 5000);
-    updateProgress();
-};
-
-BrandCreator.prototype.tryAgain = function() {
-    const formData = this.collectFormData();
-    const prompt = this.buildPrompt(formData) + " (variation)";
-    const negativePrompt = this.buildNegativePrompt(formData);
-    
-    this.showEnhancedLoading();
-    
-    this.submitBrandRequest({
-        ...formData,
-        prompt,
-        negativePrompt
-    });
-};
-
-BrandCreator.prototype.showEmailModal = function() {
-    const modal = document.getElementById('emailModal');
-    modal.style.display = 'flex';
-    
-    const userEmail = document.getElementById('userEmail');
-    userEmail.focus();
-};
-
-BrandCreator.prototype.hideEmailModal = function() {
-    const modal = document.getElementById('emailModal');
-    modal.style.display = 'none';
-    
-    const emailForm = document.getElementById('emailForm');
-    emailForm.reset();
-};
-
-BrandCreator.prototype.handleEmailSubmit = async function(event) {
-    event.preventDefault();
-    
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    
-    try {
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        submitBtn.textContent = 'Successfully Sent!';
-        
-        setTimeout(() => {
-            this.hideEmailModal();
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            this.showSuccessMessage('Your brand kit has been sent to your email!');
-        }, 1500);
-        
-    } catch (error) {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        this.showErrorMessage('Failed to send email. Please try again.');
-    }
-};
-
-BrandCreator.prototype.toggleMusic = function() {
-    const musicBtn = document.getElementById('musicToggle');
-    
-    if (this.musicPlaying) {
-        musicBtn.textContent = 'Focus Mode Audio';
-        this.musicPlaying = false;
-    } else {
-        this.playNotificationSound();
-        musicBtn.textContent = 'Stop Audio';
-        this.musicPlaying = true;
-    }
-};
-
-BrandCreator.prototype.playNotificationSound = function() {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        
-        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.1);
-    } catch (e) {
-        console.log('Audio not supported');
-    }
-};
-
-BrandCreator.prototype.showSuccessMessage = function(message) {
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        z-index: 3000;
-        font-weight: 500;
-    `;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 4000);
-};
 
 // Initialize accessibility enhancements
 document.addEventListener('DOMContentLoaded', enhanceAccessibility);

@@ -3,41 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrandForge AI - Professional Brand Creation</title>
-    <meta name="description" content="Create professional brand identities with AI-powered design intelligence. Premium logos, color palettes, and complete brand systems.">
+    <title>Brand Creator</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="header-content">
-                <div class="brand-logo">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                    </svg>
-                    <h1 class="header-title">BrandForge AI</h1>
-                </div>
-                <p class="header-subtitle">Professional brand creation powered by intelligent design algorithms</p>
-                <div class="header-value-props">
-                    <div class="value-prop">
-                        <h3>AI-Powered Design</h3>
-                        <p>Advanced algorithms that understand your industry and target audience</p>
-                    </div>
-                    <div class="value-prop">
-                        <h3>Knowledge-Based</h3>
-                        <p>Connects design principles, color psychology, and market insights</p>
-                    </div>
-                    <div class="value-prop">
-                        <h3>Professional Results</h3>
-                        <p>Studio-quality logos and complete brand systems in minutes</p>
-                    </div>
-                </div>
-            </div>
+            <h1 class="header-title">Brand Creator</h1>
+            <p class="header-subtitle">Create stunning brand identities powered by AI</p>
         </header>
 
         <!-- Main Content -->
@@ -201,113 +178,21 @@
             <!-- Results Section -->
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="results-header">
-                    <div class="success-animation">
-                        <div class="checkmark-container">
-                            <svg class="checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 12l2 2 4-4"/>
-                                <circle cx="12" cy="12" r="10"/>
-                            </svg>
-                        </div>
-                        <h2>Your Brand Identity is Complete</h2>
-                        <p>Professional designs crafted specifically for your business</p>
-                    </div>
-                    <div class="results-actions">
-                        <button class="action-btn primary" id="emailResultsBtn">
-                            Email Complete Brand Kit
-                        </button>
-                        <button class="action-btn secondary" id="tryAgainBtn">
-                            Generate Alternative Designs
-                        </button>
-                        <button class="action-btn tertiary" id="createNewBtn">
-                            Start New Brand Project
-                        </button>
-                    </div>
+                    <h2>Your Brand Identity</h2>
+                    <button class="create-new-btn" id="createNewBtn">Create New Brand</button>
                 </div>
                 
                 <div class="results-grid" id="resultsGrid">
                     <!-- Results will be dynamically inserted here -->
                 </div>
-                
-                <!-- Email Modal -->
-                <div class="modal-overlay" id="emailModal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>Receive Your Complete Brand Kit</h3>
-                            <button class="modal-close" id="closeEmailModal">×</button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Get your professional brand kit delivered to your inbox. Includes high-resolution logos, color palettes, typography guidelines, and usage recommendations.</p>
-                            <form id="emailForm" class="email-form">
-                                <div class="form-row">
-                                    <input type="email" id="userEmail" placeholder="your@email.com" required>
-                                    <input type="text" id="userName" placeholder="Your Name (Optional)">
-                                </div>
-                                <textarea id="additionalNotes" placeholder="Additional requirements or brand preferences..."></textarea>
-                                <button type="submit" class="submit-email-btn">Send Complete Brand Kit</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- Loading Section -->
             <section class="loading-section" id="loadingSection" style="display: none;">
-                <div class="loading-container">
-                    <div class="loading-card">
-                        <div class="loading-animation">
-                            <div class="spinner-container">
-                                <div class="spinner"></div>
-                                <div class="spinner-glow"></div>
-                            </div>
-                        </div>
-                        <h3 id="loadingTitle">Creating your brand identity</h3>
-                        <p id="loadingSubtitle">Our AI is analyzing your requirements and generating professional designs</p>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressFill"></div>
-                            </div>
-                            <span class="progress-text" id="progressText">0%</span>
-                        </div>
-                        <div class="loading-quote">
-                            <blockquote id="inspirationalQuote">
-                                "A brand is no longer what we tell the consumer it is—it is what consumers tell each other it is."
-                            </blockquote>
-                            <cite id="quoteAuthor">— Scott Cook, Intuit</cite>
-                        </div>
-                    </div>
-                    
-                    <!-- Educational Content Sidebar -->
-                    <div class="education-sidebar">
-                        <h4>Professional Brand Insights</h4>
-                        <div class="tip-carousel" id="tipCarousel">
-                            <div class="tip-card active">
-                                <h5>Color Psychology in Branding</h5>
-                                <p>Blue conveys trust and reliability, making it ideal for tech and finance. Red creates energy and urgency, perfect for food and retail brands.</p>
-                            </div>
-                            <div class="tip-card">
-                                <h5>Typography Selection</h5>
-                                <p>Sans-serif fonts communicate modernity and clarity, while serif fonts suggest tradition and authority. The right choice shapes perception.</p>
-                            </div>
-                            <div class="tip-card">
-                                <h5>AI Design Intelligence</h5>
-                                <p>Our system connects industry insights, color meanings, and design principles to create logos that resonate with your target market.</p>
-                            </div>
-                            <div class="tip-card">
-                                <h5>Scalable Design Systems</h5>
-                                <p>Professional brands work across all mediums. We optimize your logo for business cards, websites, and billboard advertising.</p>
-                            </div>
-                            <div class="tip-card">
-                                <h5>Brand Consistency Standards</h5>
-                                <p>Successful brands maintain consistent visual identity across all touchpoints. We provide comprehensive brand guidelines and assets.</p>
-                            </div>
-                        </div>
-                        <div class="ambient-controls">
-                            <button id="musicToggle" class="ambient-btn">Focus Mode Audio</button>
-                            <audio id="backgroundMusic" loop>
-                                <source src="data:audio/wav;base64," type="audio/wav">
-                            </audio>
-                        </div>
-                    </div>
+                <div class="loading-card">
+                    <div class="loading-animation"></div>
+                    <h3>Creating your brand identity...</h3>
+                    <p>This may take a few moments while our AI generates your unique brand elements.</p>
                 </div>
             </section>
         </main>

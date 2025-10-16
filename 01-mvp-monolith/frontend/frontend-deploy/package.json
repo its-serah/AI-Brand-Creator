@@ -1,0 +1,12 @@
+{
+  "name": "ai-brand-creator-frontend",
+  "version": "1.0.0",
+  "description": "AI Brand Creator Frontend - Professional brand generation with AI",
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "dev": "python3 -m http.server 3000"
+  },
+  "keywords": ["ai", "branding", "design", "logo", "brand-creator"],
+  "author": "Serah",
+  "license": "MIT"
+}

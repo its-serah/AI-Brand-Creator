@@ -1,0 +1,36 @@
+# ULTRA-LIGHTWEIGHT for AWS Free Tier t2.micro (1GB RAM)
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# AI/ML Libraries - MINIMAL VERSIONS
+torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+torchvision==0.16.0+cpu --index-url https://download.pytorch.org/whl/cpu
+diffusers==0.24.0
+transformers==4.36.0
+accelerate==0.24.1
+
+# Image Processing - ESSENTIAL ONLY
+Pillow==10.1.0
+numpy
+colorthief
+webcolors
+
+# Storage for AWS
+boto3==1.34.0
+
+# Utilities - MINIMAL
+pydantic-settings==2.1.0
+python-multipart==0.0.6
+
+# REMOVED FOR FREE TIER:
+# - xformers (memory heavy)
+# - opencv-python (large)
+# - scikit-image (large) 
+# - neo4j (not needed for MVP)
+# - celery/redis (not needed for t2.micro)
+# - controlnet-aux (memory heavy)
+# - reportlab (not essential)
+# - monitoring tools (use CloudWatch)
