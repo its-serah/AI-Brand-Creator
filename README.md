@@ -1,4 +1,49 @@
-# AI Brand Creator
+# BrandForge AI - Complete Brand Identity Generator
+
+## Branches & Features
+
+This repository contains multiple specialized branches for different features and deployment targets:
+
+### Feature Branches
+
+- **`stable-diffusion-x4-crisp-upscaler`** - High-quality 4x upscaling using Stable Diffusion upscaler models
+- **`resize-feature`** - Smart image resizing with aspect ratio preservation and multiple output formats
+- **`social-export-presets`** - Social media export presets and original text-to-logo functionality
+
+### Deployment Branches
+
+- **`gcp-deployment`** - Google Cloud Platform deployment with Cloud Run (current production)
+- **`aws-deployment`** - AWS deployment optimized for free tier using ECS Fargate
+
+### Main Branch
+
+- **`master`** - Stable main branch with core functionality
+
+## Live Deployment
+
+- **Frontend**: https://generatethatbrand.netlify.app
+- **Backend API**: https://brand-api-gpu-905163229563.us-central1.run.app
+
+## Quick Branch Navigation
+
+```bash
+# Switch to upscaler branch
+git checkout stable-diffusion-x4-crisp-upscaler
+
+# Switch to resize features
+git checkout resize-feature
+
+# Switch to GCP deployment
+git checkout gcp-deployment
+
+# Switch to AWS deployment  
+git checkout aws-deployment
+
+# Back to main
+git checkout master
+```
+
+# AI-Brand-Creator
 
 A comprehensive AI-powered brand generation platform with multiple architectural approaches. This repository provides four production-ready system designs, each optimized for different use cases, scales, and operational requirements.
 
