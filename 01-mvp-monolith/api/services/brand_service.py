@@ -140,9 +140,22 @@ class BrandService:
             except Exception as sched_e:
                 logger.warning(f"Could not set DPM scheduler: {sched_e}")
             
-            # Skip upscaler for now to improve reliability
-            logger.info("Skipping upscaler initialization for better performance")
-            self.upscaler_pipeline = None
+            # Initialize Stable Diffusion x4 Crisp Upscaler
+            logger.info("Loading Stable Diffusion x4 Crisp Upscaler...")
+            try:
+                self.upscaler_pipeline = StableDiffusionUpscalePipeline.from_pretrained(
+                    "stabilityai/sd-x2-latent-upscaler",
+                    torch_dtype=torch.float32,
+                    use_safetensors=True,
+                    low_cpu_mem_usage=True,
+                    cache_dir="/tmp/huggingface_cache"
+                )
+                self.upscaler_pipeline = self.upscaler_pipeline.to("cpu")
+                self.upscaler_pipeline.enable_attention_slicing("max")
+                logger.info("Upscaler pipeline loaded successfully")
+            except Exception as upscaler_e:
+                logger.warning(f"Could not load upscaler: {upscaler_e}")
+                self.upscaler_pipeline = None
             
             # Warm up the pipeline with a test generation
             logger.info("Warming up pipeline...")
@@ -1025,6 +1038,46 @@ The brand embodies a {request.style} aesthetic with {request.color_scheme} tones
         except Exception as e:
             logger.error(f"Logo enhancement failed: {e}")
             return logos  # Return original logos if enhancement fails
+    
+    def upscale_image(self, image: Image.Image, upscale_factor: int = 4) -> Image.Image:
+        """Upscale image using Stable Diffusion x4 crisp upscaler"""
+        try:
+            if self.upscaler_pipeline is None:
+                logger.warning("Upscaler not available, using simple resize")
+                new_size = (image.width * upscale_factor, image.height * upscale_factor)
+                return image.resize(new_size, Image.Resampling.LANCZOS)
+            
+            logger.info(f"Upscaling image from {image.size} with factor {upscale_factor}")
+            
+            # Convert to RGB if needed
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+            
+            # Ensure image is proper size for upscaler (typically 128x128 minimum)
+            min_size = 128
+            if image.width < min_size or image.height < min_size:
+                scale_factor = min_size / min(image.width, image.height)
+                new_width = int(image.width * scale_factor)
+                new_height = int(image.height * scale_factor)
+                image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Run upscaling
+            with torch.no_grad():
+                upscaled = self.upscaler_pipeline(
+                    image=image,
+                    num_inference_steps=10,  # Fewer steps for speed
+                    guidance_scale=5.0,
+                    output_type="pil"
+                ).images[0]
+            
+            logger.info(f"Upscaled image to {upscaled.size}")
+            return upscaled
+            
+        except Exception as e:
+            logger.error(f"Upscaling failed: {e}")
+            # Fallback to simple resize
+            new_size = (image.width * upscale_factor, image.height * upscale_factor)
+            return image.resize(new_size, Image.Resampling.LANCZOS)
     
     def _update_job_progress(self, job_id: str, progress: float, step: str):
         """Update job progress for status tracking"""
