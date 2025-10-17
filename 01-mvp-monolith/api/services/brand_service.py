@@ -69,6 +69,22 @@ class BrandService:
             "youtube_banner": (2048, 1152),
         }
         
+        # Standard logo sizes for various uses
+        self.logo_sizes = {
+            "favicon": (32, 32),
+            "small": (64, 64),
+            "medium": (128, 128),
+            "large": (256, 256),
+            "xlarge": (512, 512),
+            "print_small": (300, 300),  # 1 inch at 300 DPI
+            "print_medium": (600, 600),  # 2 inches at 300 DPI
+            "print_large": (1200, 1200),  # 4 inches at 300 DPI
+            "web_header": (200, 100),
+            "web_banner": (728, 90),
+            "mobile_app": (1024, 1024),
+            "business_card": (400, 240),
+        }
+        
     async def initialize(self):
         """Initialize AI models and external services"""
         logger.info("Initializing Brand Service...")
@@ -1025,6 +1041,113 @@ The brand embodies a {request.style} aesthetic with {request.color_scheme} tones
         except Exception as e:
             logger.error(f"Logo enhancement failed: {e}")
             return logos  # Return original logos if enhancement fails
+    
+    def resize_image_smart(self, image: Image.Image, target_size: tuple, maintain_aspect: bool = True, 
+                          background_color: str = "white", quality_mode: str = "high") -> Image.Image:
+        """Smart resize with aspect ratio preservation and quality optimization"""
+        try:
+            original_width, original_height = image.size
+            target_width, target_height = target_size
+            
+            # Choose resampling method based on quality mode
+            resampling_methods = {
+                "high": Image.Resampling.LANCZOS,
+                "medium": Image.Resampling.BILINEAR,
+                "fast": Image.Resampling.NEAREST
+            }
+            resampling = resampling_methods.get(quality_mode, Image.Resampling.LANCZOS)
+            
+            if not maintain_aspect:
+                # Simple stretch to target size
+                return image.resize(target_size, resampling)
+            
+            # Calculate aspect ratios
+            original_ratio = original_width / original_height
+            target_ratio = target_width / target_height
+            
+            if original_ratio > target_ratio:
+                # Image is wider, fit by width
+                new_width = target_width
+                new_height = int(target_width / original_ratio)
+            else:
+                # Image is taller, fit by height
+                new_height = target_height
+                new_width = int(target_height * original_ratio)
+            
+            # Resize the image
+            resized = image.resize((new_width, new_height), resampling)
+            
+            # Create new image with target size and background color
+            result = Image.new('RGBA', target_size, background_color)
+            
+            # Calculate position to center the resized image
+            x = (target_width - new_width) // 2
+            y = (target_height - new_height) // 2
+            
+            # Paste the resized image onto the background
+            if resized.mode == 'RGBA':
+                result.paste(resized, (x, y), resized)
+            else:
+                result.paste(resized, (x, y))
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Smart resize failed: {e}")
+            return image.resize(target_size, Image.Resampling.LANCZOS)
+    
+    def generate_logo_size_variants(self, image: Image.Image, job_id: str = None) -> Dict[str, Dict[str, Any]]:
+        """Generate logo variants in all standard sizes"""
+        variants = {}
+        
+        try:
+            total_sizes = len(self.logo_sizes)
+            
+            for i, (size_name, dimensions) in enumerate(self.logo_sizes.items()):
+                if job_id:
+                    progress = 0.7 + (i / total_sizes) * 0.15  # Progress from 70% to 85%
+                    self._update_job_progress(job_id, progress, f"Creating {size_name} variant")
+                
+                # Create variant with smart resizing
+                variant = self.resize_image_smart(image, dimensions, maintain_aspect=True)
+                
+                # Save variant
+                variant_filename = f"logo_{size_name}_{dimensions[0]}x{dimensions[1]}.png"
+                variant_path = os.path.join(self.variations_dir, variant_filename)
+                variant.save(variant_path, "PNG", quality=95, optimize=True)
+                
+                variants[size_name] = {
+                    "dimensions": dimensions,
+                    "path": variant_path,
+                    "url": self._image_to_data_url(variant),
+                    "use_case": self._get_size_use_case(size_name),
+                    "file_size_kb": os.path.getsize(variant_path) // 1024 if os.path.exists(variant_path) else 0
+                }
+            
+            logger.info(f"Generated {len(variants)} logo size variants")
+            return variants
+            
+        except Exception as e:
+            logger.error(f"Failed to generate size variants: {e}")
+            return {}
+    
+    def _get_size_use_case(self, size_name: str) -> str:
+        """Get the recommended use case for each size variant"""
+        use_cases = {
+            "favicon": "Website favicon and small icons",
+            "small": "UI elements and small web graphics",
+            "medium": "Website headers and medium graphics",
+            "large": "Large web graphics and presentations",
+            "xlarge": "High-resolution web use and small print",
+            "print_small": "Business cards and small print materials",
+            "print_medium": "Letterheads and medium print materials",
+            "print_large": "Posters and large print materials",
+            "web_header": "Website headers and banners",
+            "web_banner": "Web advertisements and banners",
+            "mobile_app": "Mobile app icons and high-DPI displays",
+            "business_card": "Business cards and compact layouts"
+        }
+        return use_cases.get(size_name, "General purpose")
     
     def _update_job_progress(self, job_id: str, progress: float, step: str):
         """Update job progress for status tracking"""
