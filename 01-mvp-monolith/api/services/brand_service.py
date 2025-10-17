@@ -246,7 +246,7 @@ class BrandService:
                     hex_color = color_info['hex']
                     if hex_color not in seen_colors:
                         seen_colors.add(hex_color)
-                        unique_extracted_colors.append(color_info)
+                        unique_extracted_colors.append(hex_color)  # Just use the hex string
                 elif isinstance(color_info, str) and color_info not in seen_colors:
                     seen_colors.add(color_info)
                     unique_extracted_colors.append(color_info)
