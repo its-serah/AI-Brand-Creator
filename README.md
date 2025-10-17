@@ -1,47 +1,66 @@
 # BrandForge AI - Complete Brand Identity Generator
 
-## Branches & Features
+**Professional AI-powered brand generation with full pipeline: Text → Logo → Upscaling → Color Extraction → Social Export**
 
-This repository contains multiple specialized branches for different features and deployment targets:
+## Production Branches
 
-### Feature Branches
+### Ready-to-Deploy Production Branches
 
-- **`stable-diffusion-x4-crisp-upscaler`** - High-quality 4x upscaling using Stable Diffusion upscaler models
-- **`resize-feature`** - Smart image resizing with aspect ratio preservation and multiple output formats
-- **`social-export-presets`** - Social media export presets and original text-to-logo functionality
+- **`production-gcp`** - Complete production build with all features + GCP Cloud Run deployment
+  - ✅ Stable Diffusion x4 Crisp Upscaler
+  - ✅ Smart image resizing with aspect ratio preservation
+  - ✅ Multiple logo size variants (favicon, print, web, mobile)
+  - ✅ Color extraction and palette generation
+  - ✅ Social media export presets
+  - ✅ Automated GCP deployment scripts
+  - ✅ Cloud Run optimized with monitoring
 
-### Deployment Branches
+- **`production-aws`** - Complete production build with all features + AWS ECS deployment
+  - ✅ All features from GCP branch
+  - ✅ AWS ECS Fargate deployment (free tier optimized)
+  - ✅ ECR container registry integration
+  - ✅ CloudWatch logging and monitoring
+  - ✅ Auto-scaling and health checks
 
-- **`gcp-deployment`** - Google Cloud Platform deployment with Cloud Run (current production)
-- **`aws-deployment`** - AWS deployment optimized for free tier using ECS Fargate
-
-### Main Branch
-
-- **`master`** - Stable main branch with core functionality
-
-## Live Deployment
+## Live Production Deployment
 
 - **Frontend**: https://generatethatbrand.netlify.app
 - **Backend API**: https://brand-api-gpu-905163229563.us-central1.run.app
+- **Status**: Fully functional with complete AI pipeline
 
-## Quick Branch Navigation
+## Complete AI Pipeline
+
+```
+📝 TEXT PROMPT → 🎨 STABLE DIFFUSION → 🖼️ BASE LOGO
+    ↓
+🔄 IMAGE-TO-IMAGE REFINEMENT → ✨ ENHANCED LOGO
+    ↓
+⬆️ 4X CRISP UPSCALER → 📐 SMART RESIZE → 🎨 COLOR EXTRACTION
+    ↓
+📱 SOCIAL MEDIA EXPORTS → 📦 COMPLETE BRAND KIT
+```
+
+## Quick Production Deployment
 
 ```bash
-# Switch to upscaler branch
-git checkout stable-diffusion-x4-crisp-upscaler
+# Deploy to Google Cloud Platform
+git checkout production-gcp
+./gcp/deploy.sh
 
-# Switch to resize features
-git checkout resize-feature
+# Deploy to AWS
+git checkout production-aws
+./aws/deploy.sh
 
-# Switch to GCP deployment
-git checkout gcp-deployment
-
-# Switch to AWS deployment  
-git checkout aws-deployment
-
-# Back to main
+# Return to main
 git checkout master
 ```
+
+## Development Branches (Feature-Specific)
+
+- **`stable-diffusion-x4-crisp-upscaler`** - Upscaler model integration
+- **`resize-feature`** - Image resizing and variants
+- **`gcp-deployment`** - GCP deployment scripts only
+- **`aws-deployment`** - AWS deployment scripts only
 
 # AI-Brand-Creator
 
