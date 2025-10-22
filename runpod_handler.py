@@ -16,10 +16,10 @@ pipe = None
 def load_model():
     global pipe
     if pipe is None:
+        print("Loading Stable Diffusion model...")
         pipe = StableDiffusionPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4",
+            "runwayml/stable-diffusion-v1-5",  # More reliable model
             torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            use_safetensors=True,
             safety_checker=None,
             requires_safety_checker=False
         )
@@ -27,8 +27,8 @@ def load_model():
         if torch.cuda.is_available():
             pipe = pipe.to("cuda")
             pipe.enable_attention_slicing()
-            pipe.enable_model_cpu_offload()
         
+        print("Model loaded successfully!")
     return pipe
 
 def handler(job):
