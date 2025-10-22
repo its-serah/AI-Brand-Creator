@@ -11,12 +11,14 @@ from PIL import Image, ImageFilter
 import io
 import base64
 import os
+import requests
+import json
 
 import tempfile
 import webcolors
 
 try:
-    from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
+    from diffusers import StableDiffusionPipeline
     import torch
     import numpy as np
     from skimage import color, filters
@@ -43,7 +45,6 @@ class BrandService:
         
         # Model components (to be initialized)
         self.sd_pipeline = None
-        self.upscaler_pipeline = None
         self.controlnet = None
         self.neo4j_driver = None
         # Force CPU for stability (you can change to cuda if you have GPU)
@@ -95,24 +96,34 @@ class BrandService:
             return
             
         try:
-            # Set optimal torch settings for CPU
-            torch.set_num_threads(4)  # Use 4 CPU threads
+            # Set optimal torch settings for AWS t2.micro (1 vCPU, 1GB RAM)
+            torch.set_num_threads(1)  # t2.micro has only 1 vCPU
             torch.manual_seed(42)     # Set seed for reproducible results
+            
+            # Aggressive memory management for 1GB RAM
+            os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
+            os.environ['OMP_NUM_THREADS'] = '1'
             
             logger.info(f"Loading Stable Diffusion model on CPU with optimizations...")
             
-            # Use ultra-lightweight model for AWS Free Tier
-            logger.info("Loading CompVis/stable-diffusion-v1-4 with extreme optimizations for free tier...")
-            self.sd_pipeline = StableDiffusionPipeline.from_pretrained(
-                "CompVis/stable-diffusion-v1-4",  # Smaller than v1.5
-                torch_dtype=torch.float32,
-                use_safetensors=True,
-                safety_checker=None,  # Disable for speed and memory
-                requires_safety_checker=False,
-                low_cpu_mem_usage=True,
-                variant=None,  # No fp16 variant to save memory
-                cache_dir="/tmp/huggingface_cache"  # Use tmp for free tier
+            # AWS t2.micro runs the API server
+            # RunPod handles the heavy AI processing
+            logger.info("AWS + RunPod Hybrid Mode: API server on AWS, AI on RunPod")
+            
+            # No local model loading - we'll use RunPod API
+            self.sd_pipeline = None
+            
+            # Set RunPod endpoint (you'll need to set this after deployment)
+            self.runpod_endpoint = os.environ.get(
+                'RUNPOD_ENDPOINT_URL', 
+                'https://api.runpod.ai/v2/YOUR_ENDPOINT_ID/runsync'
             )
+            self.runpod_api_key = os.environ.get('RUNPOD_API_KEY', '')
+            
+            if self.runpod_api_key:
+                logger.info("RunPod API configured - will use GPU inference")
+            else:
+                logger.warning("No RunPod API key - will use fallback generation")
             
             # Move to CPU and apply aggressive optimizations
             self.sd_pipeline = self.sd_pipeline.to("cpu")
@@ -140,9 +151,8 @@ class BrandService:
             except Exception as sched_e:
                 logger.warning(f"Could not set DPM scheduler: {sched_e}")
             
-            # Skip upscaler for now to improve reliability
-            logger.info("Skipping upscaler initialization for better performance")
-            self.upscaler_pipeline = None
+            # Using PIL-based upscaling for better reliability and performance
+            logger.info("Using enhanced PIL upscaling for better performance and reliability")
             
             # Warm up the pipeline with a test generation
             logger.info("Warming up pipeline...")
@@ -291,8 +301,11 @@ class BrandService:
         try:
             logos = []
             
-            # Use Stable Diffusion if available, otherwise fallback to placeholder
-            if self.sd_pipeline:
+            # Use RunPod API if configured, then local SD if available, otherwise fallback
+            if self.runpod_api_key:
+                logger.info("Using RunPod GPU for logo generation")
+                return await self._generate_logos_runpod(request)
+            elif self.sd_pipeline:
                 logger.info("SD pipeline available, checking pipeline status...")
                 
                 # Verify pipeline is ready
@@ -324,17 +337,23 @@ class BrandService:
                         # Ultra-fast generation for free tier
                         try:
                             logger.debug(f"Calling SD pipeline for logo {i+1}...")
+                            # Ultra-optimized for t2.micro
                             result = self.sd_pipeline(
                                 prompt=logo_prompt,
                                 negative_prompt=negative_prompt,
                                 num_images_per_prompt=1,
-                                num_inference_steps=4,   # ULTRA FAST - 4 steps only
-                                guidance_scale=3.5,      # Lower guidance for speed
-                                width=256,               # Smaller for t2.micro
-                                height=256,              # Smaller for t2.micro
+                                num_inference_steps=2,   # Minimum viable - 2 steps
+                                guidance_scale=2.0,      # Minimal guidance
+                                width=128,               # Tiny size for 1GB RAM
+                                height=128,              # Tiny size for 1GB RAM
                                 generator=generator,
                                 output_type="pil"
                             )
+                            
+                            # Immediately free memory after generation
+                            torch.cuda.empty_cache()
+                            if torch.cuda.is_available():
+                                torch.cuda.synchronize()
                             
                             if result and hasattr(result, 'images') and result.images:
                                 images.append(result.images[0])
@@ -402,6 +421,90 @@ class BrandService:
             except Exception as fallback_e:
                 logger.error(f"Fallback generation also failed: {fallback_e}")
                 raise
+    
+    async def _generate_logos_runpod(self, request: BrandRequest) -> List[LogoResult]:
+        """Generate logos using RunPod GPU API"""
+        logger.info(f"Generating logos via RunPod for {request.business_name}")
+        
+        try:
+            logos = []
+            
+            # Build prompt
+            logo_prompt = self._build_sd_prompt(request)
+            negative_prompt = self._build_sd_negative_prompt(request)
+            
+            # Prepare RunPod API request
+            headers = {
+                "Authorization": f"Bearer {self.runpod_api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            for i in range(request.num_logos):
+                logger.info(f"Requesting logo {i+1}/{request.num_logos} from RunPod...")
+                
+                payload = {
+                    "input": {
+                        "prompt": logo_prompt,
+                        "negative_prompt": negative_prompt,
+                        "num_images": 1,
+                        "width": 512,  # Full quality on GPU!
+                        "height": 512,
+                        "steps": 30    # More steps for better quality
+                    }
+                }
+                
+                # Call RunPod API
+                response = requests.post(
+                    self.runpod_endpoint,
+                    headers=headers,
+                    json=payload,
+                    timeout=60
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("output", {}).get("status") == "success":
+                        images_base64 = result["output"].get("images", [])
+                        
+                        for img_base64 in images_base64:
+                            # Convert base64 to PIL Image
+                            img_bytes = base64.b64decode(img_base64)
+                            img = Image.open(io.BytesIO(img_bytes))
+                            
+                            # Enhance and save
+                            enhanced_img = self._enhance_logo(img)
+                            logo_id = str(uuid.uuid4())
+                            
+                            # Convert to data URL
+                            logo_url = self._image_to_data_url(enhanced_img)
+                            
+                            logos.append(LogoResult(
+                                id=logo_id,
+                                url=logo_url,
+                                thumbnail_url=logo_url,
+                                style_confidence=0.90 + (i * 0.03),
+                                quality_score=0.95,  # High quality from GPU
+                                metadata={
+                                    "generated_with": "runpod_gpu",
+                                    "style": request.style,
+                                    "industry": request.industry,
+                                    "infrastructure": "AWS + RunPod Hybrid"
+                                }
+                            ))
+                else:
+                    logger.error(f"RunPod API error: {response.status_code}")
+                    
+                await asyncio.sleep(1)  # Rate limiting
+            
+            if not logos:
+                logger.warning("No logos from RunPod, using fallback")
+                return await self._generate_fallback_logos(request)
+                
+            return logos
+            
+        except Exception as e:
+            logger.error(f"RunPod generation failed: {e}")
+            return await self._generate_fallback_logos(request)
     
     async def _generate_fallback_logos(self, request: BrandRequest) -> List[LogoResult]:
         """Generate fallback placeholder logos when AI generation fails"""
@@ -721,34 +824,52 @@ class BrandService:
             return [original_image]
     
     def _upscale_logo(self, image: Image.Image, prompt: str) -> Image.Image:
-        """Upscale logo using Stable Diffusion x4 upscaler"""
+        """Upscale logo using enhanced PIL methods with sharpening"""
         try:
-            if not self.upscaler_pipeline:
-                logger.warning("Upscaler not available, returning original size")
-                return image
+            # Use high-quality PIL upscaling with Lanczos resampling
+            # This is more reliable than the SD upscaler and works on CPU
+            original_size = image.size
+            target_scale = 4  # 4x upscaling
             
-            # Ensure image is the right size for upscaler (128x128 minimum)
-            if image.size[0] < 128 or image.size[1] < 128:
-                image = image.resize((128, 128), Image.Resampling.LANCZOS)
+            # Calculate new dimensions
+            new_width = original_size[0] * target_scale
+            new_height = original_size[1] * target_scale
             
-            logger.info(f"Upscaling logo from {image.size} to 4x resolution...")
+            # Limit maximum size to prevent memory issues
+            max_dimension = 2048
+            if new_width > max_dimension or new_height > max_dimension:
+                scale = max_dimension / max(new_width, new_height)
+                new_width = int(new_width * scale)
+                new_height = int(new_height * scale)
             
-            # Generate upscaled image
-            upscaled = self.upscaler_pipeline(
-                prompt=prompt,
-                image=image,
-                num_inference_steps=20,
-                guidance_scale=0,  # Use 0 for logo upscaling
-                noise_level=20
-            ).images[0]
+            logger.info(f"Upscaling logo from {original_size} to ({new_width}, {new_height})...")
             
-            logger.info(f"Successfully upscaled logo to {upscaled.size}")
+            # Step 1: Initial upscale with LANCZOS (best quality)
+            upscaled = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Step 2: Apply multiple enhancement passes for better quality
+            # Slight sharpening to improve details
+            upscaled = upscaled.filter(ImageFilter.UnsharpMask(radius=1, percent=100, threshold=3))
+            
+            # Step 3: Edge enhancement for crisper logos
+            upscaled = upscaled.filter(ImageFilter.EDGE_ENHANCE_MORE)
+            
+            # Step 4: Final smoothing to reduce artifacts
+            upscaled = upscaled.filter(ImageFilter.SMOOTH_MORE)
+            
+            # Step 5: Final sharpening pass
+            upscaled = upscaled.filter(ImageFilter.SHARPEN)
+            
+            logger.info(f"Successfully upscaled logo to {upscaled.size} using enhanced PIL method")
             return upscaled
             
         except Exception as e:
             logger.error(f"Logo upscaling failed: {e}")
             # Return 2x scaled version as fallback
-            return image.resize((image.size[0] * 2, image.size[1] * 2), Image.Resampling.LANCZOS)
+            try:
+                return image.resize((image.size[0] * 2, image.size[1] * 2), Image.Resampling.LANCZOS)
+            except:
+                return image
     
     def _create_social_media_exports(self, logo: Image.Image, logo_id: str) -> Dict[str, str]:
         """Create social media format exports of the logo"""
