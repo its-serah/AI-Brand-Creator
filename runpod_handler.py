@@ -1,18 +1,37 @@
 """
-RunPod Handler for Your AI Brand Creator
-Uses your sophisticated brand generation system
+RunPod Handler for AI Brand Creator - Enhanced with Real-ESRGAN & ControlNet
+Full AI pipeline: Text-to-Image → AI Upscaling → AI Refinement
 """
 
 import runpod
 import torch
-from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
+from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler, StableDiffusionControlNetPipeline, ControlNetModel
 from PIL import Image, ImageEnhance, ImageFilter
 import base64
 import io
 import os
+import numpy as np
+import cv2
 
-# Load model once globally
+# AI Models imports
+try:
+    from realesrgan import RealESRGANer
+    from basicsr.archs.rrdbnet_arch import RRDBNet
+    REALESRGAN_AVAILABLE = True
+except ImportError:
+    REALESRGAN_AVAILABLE = False
+
+try:
+    from controlnet_aux import CannyDetector
+    CONTROLNET_AVAILABLE = True
+except ImportError:
+    CONTROLNET_AVAILABLE = False
+
+# Load models once globally
 pipe = None
+upscaler = None
+controlnet_pipe = None
+canny_detector = None
 
 def load_model():
     global pipe
@@ -37,23 +56,185 @@ def load_model():
         print("Brand generation model loaded successfully!")
     return pipe
 
-def enhance_logo(img):
-    """Apply your logo enhancement pipeline"""
+def load_upscaler():
+    """Load Real-ESRGAN upscaler"""
+    global upscaler
+    if upscaler is None and REALESRGAN_AVAILABLE:
+        try:
+            print("Loading Real-ESRGAN 4x upscaler...")
+            model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+            model_path = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth'
+            
+            upscaler = RealESRGANer(
+                scale=4,
+                model_path=model_path,
+                model=model,
+                tile=512,
+                tile_pad=10,
+                pre_pad=0,
+                half=torch.cuda.is_available()
+            )
+            print("Real-ESRGAN upscaler loaded successfully!")
+        except Exception as e:
+            print(f"Failed to load Real-ESRGAN: {e}")
+            upscaler = None
+    return upscaler
+
+def load_controlnet():
+    """Load ControlNet for refinement"""
+    global controlnet_pipe, canny_detector
+    if controlnet_pipe is None and CONTROLNET_AVAILABLE:
+        try:
+            print("Loading ControlNet for logo refinement...")
+            controlnet = ControlNetModel.from_pretrained(
+                "lllyasviel/sd-controlnet-canny",
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
+            )
+            
+            controlnet_pipe = StableDiffusionControlNetPipeline.from_pretrained(
+                "runwayml/stable-diffusion-v1-5",
+                controlnet=controlnet,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                safety_checker=None,
+                requires_safety_checker=False
+            )
+            
+            if torch.cuda.is_available():
+                controlnet_pipe = controlnet_pipe.to("cuda")
+                controlnet_pipe.enable_model_cpu_offload()
+            
+            canny_detector = CannyDetector()
+            print("ControlNet loaded successfully!")
+        except Exception as e:
+            print(f"Failed to load ControlNet: {e}")
+            controlnet_pipe = None
+    
+    return controlnet_pipe, canny_detector
+
+def ai_upscale_logo(img):
+    """AI upscale using Real-ESRGAN"""
     try:
-        # Sharpen the image
-        enhancer = ImageEnhance.Sharpness(img)
-        img = enhancer.enhance(1.5)
+        upscaler_model = load_upscaler()
+        if upscaler_model is None:
+            print("Real-ESRGAN not available, using PIL fallback")
+            return pil_upscale_fallback(img)
+            
+        print(f"AI upscaling image from {img.size}...")
         
-        # Enhance contrast  
-        enhancer = ImageEnhance.Contrast(img)
-        img = enhancer.enhance(1.2)
+        # Convert PIL to numpy array
+        img_array = np.array(img.convert('RGB'))
+        img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
         
-        # Apply slight unsharp mask
-        img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=120, threshold=3))
+        # Perform AI upscaling
+        enhanced_img, _ = upscaler_model.enhance(img_bgr, outscale=4)
         
-        return img
+        # Convert back to RGB and PIL
+        enhanced_rgb = cv2.cvtColor(enhanced_img, cv2.COLOR_BGR2RGB)
+        upscaled_img = Image.fromarray(enhanced_rgb)
+        
+        print(f"Successfully AI-upscaled to {upscaled_img.size}")
+        return upscaled_img
+        
     except Exception as e:
-        print(f"Enhancement failed: {e}")
+        print(f"AI upscaling failed: {e}")
+        return pil_upscale_fallback(img)
+
+def pil_upscale_fallback(img, scale=4):
+    """Fallback PIL upscaling"""
+    print(f"Using PIL fallback upscaling {scale}x")
+    new_size = (img.width * scale, img.height * scale)
+    upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
+    upscaled = upscaled.filter(ImageFilter.UnsharpMask(radius=1, percent=150, threshold=3))
+    return upscaled
+
+def ai_refine_logo(img, prompt):
+    """Refine logo using ControlNet"""
+    try:
+        controlnet_pipeline, canny_det = load_controlnet()
+        if controlnet_pipeline is None or canny_det is None:
+            print("ControlNet not available, skipping refinement")
+            return img
+            
+        print("Refining logo with ControlNet...")
+        
+        # Create control image
+        control_image = canny_det(img)
+        
+        # Refine with ControlNet
+        refined_prompt = f"professional logo design, {prompt}, high quality, clean, minimalist"
+        
+        with torch.no_grad():
+            result = controlnet_pipeline(
+                prompt=refined_prompt,
+                image=control_image,
+                num_inference_steps=15,
+                guidance_scale=7.5,
+                controlnet_conditioning_scale=0.7,
+                width=img.width,
+                height=img.height
+            )
+        
+        refined_img = result.images[0]
+        print("Successfully refined logo with ControlNet")
+        return refined_img
+        
+    except Exception as e:
+        print(f"ControlNet refinement failed: {e}")
+        return img
+
+def create_social_sizes(img):
+    """Create multiple social media sizes from the enhanced logo"""
+    sizes = {
+        'original': img.size,
+        'facebook': (1200, 630),
+        'instagram': (1080, 1080), 
+        'twitter': (1024, 512),
+        'linkedin': (1200, 627),
+        'website': (512, 512),
+        'favicon': (64, 64)
+    }
+    
+    social_images = {}
+    
+    for size_name, (width, height) in sizes.items():
+        if size_name == 'original':
+            social_images[size_name] = img
+        else:
+            # Create sized version with proper aspect ratio handling
+            if img.width != img.height and width == height:
+                # For square formats, crop to center square first
+                min_side = min(img.width, img.height)
+                left = (img.width - min_side) // 2
+                top = (img.height - min_side) // 2
+                square_img = img.crop((left, top, left + min_side, top + min_side))
+                resized = square_img.resize((width, height), Image.Resampling.LANCZOS)
+            else:
+                resized = img.resize((width, height), Image.Resampling.LANCZOS)
+            
+            social_images[size_name] = resized
+    
+    return social_images
+
+def enhance_logo(img, prompt="professional logo"):
+    """Complete AI enhancement pipeline"""
+    try:
+        print("Starting AI enhancement pipeline...")
+        
+        # Step 1: AI Upscaling with Real-ESRGAN
+        upscaled_img = ai_upscale_logo(img)
+        
+        # Step 2: AI Refinement with ControlNet
+        refined_img = ai_refine_logo(upscaled_img, prompt)
+        
+        # Step 3: Final touch-ups
+        enhancer = ImageEnhance.Sharpness(refined_img)
+        final_img = enhancer.enhance(1.1)
+        
+        print("AI enhancement pipeline completed!")
+        return final_img
+        
+    except Exception as e:
+        print(f"Enhancement pipeline failed: {e}")
         return img
 
 def build_brand_prompt(prompt, industry="technology", style="modern"):
@@ -121,22 +302,38 @@ def handler(job):
         
         img = result.images[0]
         
-        # Apply your enhancement pipeline
-        enhanced_img = enhance_logo(img)
+        # Apply AI enhancement pipeline (Real-ESRGAN + ControlNet)
+        enhanced_img = enhance_logo(img, prompt)
         
-        # Convert to base64
-        buffer = io.BytesIO()
-        enhanced_img.save(buffer, format='PNG', quality=95)
-        img_base64 = base64.b64encode(buffer.getvalue()).decode()
+        # Create multiple social media sizes
+        social_images = create_social_sizes(enhanced_img)
+        
+        # Convert all sizes to base64
+        images_data = {}
+        for size_name, sized_img in social_images.items():
+            buffer = io.BytesIO()
+            sized_img.save(buffer, format='PNG', quality=95)
+            img_base64 = base64.b64encode(buffer.getvalue()).decode()
+            images_data[size_name] = {
+                "data": f"data:image/png;base64,{img_base64}",
+                "width": sized_img.width,
+                "height": sized_img.height,
+                "size": f"{sized_img.width}x{sized_img.height}"
+            }
         
         return {
             "status": "success",
-            "images": [img_base64],
+            "images": [images_data['original']['data']],  # Keep backward compatibility
+            "social_media_pack": images_data,
             "prompt_used": brand_prompt,
             "industry": industry,
             "style": style,
+            "business_name": business_name,
             "enhanced": True,
-            "resolution": "1024x1024"
+            "ai_upscaled": REALESRGAN_AVAILABLE,
+            "controlnet_refined": CONTROLNET_AVAILABLE,
+            "resolution": f"{enhanced_img.width}x{enhanced_img.height}",
+            "enhancement_pipeline": "Real-ESRGAN + ControlNet + Traditional"
         }
         
     except Exception as e:
@@ -147,5 +344,8 @@ def handler(job):
         }
 
 if __name__ == "__main__":
-    print("Starting AI Brand Creator RunPod handler...")
+    print("Starting Enhanced AI Brand Creator RunPod handler...")
+    print("Features: Text-to-Image + Real-ESRGAN + ControlNet + Color Processing")
+    print(f"Real-ESRGAN Available: {REALESRGAN_AVAILABLE}")
+    print(f"ControlNet Available: {CONTROLNET_AVAILABLE}")
     runpod.serverless.start({"handler": handler})
